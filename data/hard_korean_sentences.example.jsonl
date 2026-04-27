@@ -1,0 +1,5 @@
+{"id":"hard-ko-0001","text":"22B Labs는 OpenAI API를 사용해 TTS v2.1을 테스트했다.","tags":["english_brand","english_acronym","version_number","josa_after_english","technical_narration"],"expected_speech_text":"이십이비 랩스는 오픈에이아이 에이피아이를 사용해 티티에스 버전 이 점 일을 테스트했다."}
+{"id":"hard-ko-0002","text":"2026년 4월 27일 오후 3시 5분에 결과가 나왔다.","tags":["year","month_day","time"],"expected_speech_text":"이천이십육 년 사월 이십칠일 오후 세 시 오 분에 결과가 나왔다."}
+{"id":"hard-ko-0003","text":"010-1234-5678로 전화하지 말고 이메일로 보내 주세요.","tags":["telephone","digit_by_digit"],"expected_speech_text":"공일공 일이삼사 오육칠팔로 전화하지 말고 이메일로 보내 주세요."}
+{"id":"hard-ko-0004","text":"국립 연구소의 값이 예상보다 컸다.","tags":["nasalization","final_consonant"],"expected_phoneme_text":"궁닙 연구소의 갑씨 예상보다 컸다."}
+

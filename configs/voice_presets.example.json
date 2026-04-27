@@ -1,0 +1,27 @@
+{
+  "calm_narrator": {
+    "label": "차분한 내레이터",
+    "identity_strength": 0.82,
+    "role_strength": 0.45,
+    "speed": 0.92,
+    "pitch_shift": -1.0,
+    "pause_scale": 1.1
+  },
+  "old_storyteller": {
+    "label": "따뜻한 노년 이야기꾼",
+    "identity_strength": 0.68,
+    "role_strength": 0.75,
+    "speed": 0.78,
+    "pitch_shift": -4.0,
+    "pause_scale": 1.45
+  },
+  "villain_low": {
+    "label": "낮고 절제된 악역",
+    "identity_strength": 0.62,
+    "role_strength": 0.82,
+    "speed": 0.74,
+    "pitch_shift": -5.0,
+    "pause_scale": 1.35
+  }
+}
+

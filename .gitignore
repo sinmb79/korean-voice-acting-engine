@@ -1,0 +1,34 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Local generated outputs
+outputs/*
+!outputs/.gitkeep
+
+# Sensitive voice assets and model artifacts
+profiles/
+voice_profiles/
+recordings/
+datasets/private/
+models/
+checkpoints/
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.wav
+*.mp3
+*.flac
+*.m4a
+
+# Local environment
+.env
+.env.*
+

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kva-engine"
+version = "0.1.0"
+description = "Korean-first voice acting TTS engine toolkit"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "22B Labs" }
+]
+keywords = ["korean", "tts", "voice-acting", "text-normalization", "speech"]
+dependencies = []
+
+[project.scripts]
+kva = "kva_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

@@ -1,0 +1,128 @@
+from __future__ import annotations
+
+from kva_engine.schemas import VoiceActingPlan
+
+
+PRESETS: dict[str, VoiceActingPlan] = {
+    "calm_narrator": VoiceActingPlan(
+        role="calm_narrator",
+        emotion="neutral_confident",
+        identity_strength=0.82,
+        role_strength=0.45,
+        pitch_shift=-1.0,
+        pitch_variance=0.82,
+        speed=0.92,
+        breathiness=0.12,
+        articulation_strength=0.78,
+        pause_scale=1.1,
+        ending_style="low_falling",
+        formality="polite",
+    ),
+    "documentary": VoiceActingPlan(
+        role="documentary",
+        emotion="quiet_awe",
+        identity_strength=0.78,
+        role_strength=0.58,
+        pitch_shift=-2.0,
+        pitch_variance=0.72,
+        speed=0.86,
+        breathiness=0.18,
+        articulation_strength=0.74,
+        pause_scale=1.25,
+        ending_style="deep_falling",
+        formality="polite",
+    ),
+    "news_anchor": VoiceActingPlan(
+        role="news_anchor",
+        emotion="controlled_clear",
+        identity_strength=0.74,
+        role_strength=0.62,
+        pitch_shift=0.0,
+        pitch_variance=0.55,
+        speed=1.0,
+        breathiness=0.04,
+        articulation_strength=0.92,
+        pause_scale=0.95,
+        ending_style="firm_falling",
+        formality="formal",
+    ),
+    "bright_teacher": VoiceActingPlan(
+        role="bright_teacher",
+        emotion="warm_encouraging",
+        identity_strength=0.8,
+        role_strength=0.5,
+        pitch_shift=1.5,
+        pitch_variance=0.9,
+        speed=0.98,
+        breathiness=0.1,
+        articulation_strength=0.82,
+        pause_scale=1.0,
+        ending_style="friendly_falling",
+        formality="polite",
+    ),
+    "old_storyteller": VoiceActingPlan(
+        role="old_storyteller",
+        emotion="warm_regret",
+        identity_strength=0.68,
+        role_strength=0.75,
+        pitch_shift=-4.0,
+        pitch_variance=0.65,
+        speed=0.78,
+        breathiness=0.45,
+        articulation_strength=0.64,
+        pause_scale=1.45,
+        ending_style="low_falling",
+        formality="plain",
+    ),
+    "villain_low": VoiceActingPlan(
+        role="villain_low",
+        emotion="restrained_threat",
+        identity_strength=0.62,
+        role_strength=0.82,
+        pitch_shift=-5.0,
+        pitch_variance=0.5,
+        speed=0.74,
+        breathiness=0.22,
+        articulation_strength=0.7,
+        pause_scale=1.35,
+        ending_style="held_low",
+        formality="plain",
+    ),
+    "childlike_fast": VoiceActingPlan(
+        role="childlike_fast",
+        emotion="curious_bright",
+        identity_strength=0.52,
+        role_strength=0.9,
+        pitch_shift=5.0,
+        pitch_variance=1.25,
+        speed=1.16,
+        breathiness=0.08,
+        articulation_strength=0.76,
+        pause_scale=0.82,
+        ending_style="light_rising",
+        formality="plain",
+    ),
+    "ai_assistant": VoiceActingPlan(
+        role="ai_assistant",
+        emotion="kind_precise",
+        identity_strength=0.76,
+        role_strength=0.5,
+        pitch_shift=0.5,
+        pitch_variance=0.62,
+        speed=0.96,
+        breathiness=0.05,
+        articulation_strength=0.88,
+        pause_scale=1.02,
+        ending_style="clean_falling",
+        formality="polite",
+    ),
+}
+
+
+def get_preset(role: str) -> VoiceActingPlan:
+    try:
+        return PRESETS[role]
+    except KeyError as exc:
+        available = ", ".join(sorted(PRESETS))
+        raise ValueError(f"Unknown role: {role}. Available roles: {available}") from exc
+
