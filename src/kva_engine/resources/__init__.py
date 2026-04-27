@@ -1,0 +1,1 @@
+"""Bundled KVAE data resources."""

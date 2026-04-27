@@ -59,6 +59,12 @@ python -m kva_engine public-voices
 python -m kva_engine voice-profile public:mms-tts-kor
 ```
 
+로컬 실행 환경과 안전 설정은 아래처럼 점검합니다.
+
+```powershell
+python -m kva_engine doctor --voice-profile public:mms-tts-kor
+```
+
 SSML과 생성 manifest도 바로 만들 수 있습니다.
 
 ```powershell
@@ -118,6 +124,7 @@ python -m compileall -q src
 - `docs/KVAE_CONVERT_ENGINE.md`: 녹음 음성 입력 기반 캐릭터 변환 경로
 - `docs/KVAE_REVIEW_ENGINE.md`: 오디오 품질, ASR, WER/CER 검증 경로
 - `docs/PUBLIC_VOICE_CATALOG.md`: 공개 한국어 AI 음성 카탈로그
+- `docs/RELEASE_QUALITY_GATES.md`: 릴리스 품질 게이트
 - `docs/SAFETY_POLICY.md`: 음성/동의/공개 정책
 - `docs/SECURE_DEVELOPMENT.md`: 보안 환경 개발 원칙
 

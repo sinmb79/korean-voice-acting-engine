@@ -7,6 +7,7 @@ from pathlib import Path
 
 from kva_engine.acting.planner import plan_voice_acting
 from kva_engine.acting.presets import PRESETS
+from kva_engine.diagnostics import run_doctor
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
 from kva_engine.public_voices import get_public_voice, list_public_voices, load_public_voice_catalog, public_voice_profile
@@ -31,6 +32,12 @@ def main(argv: list[str] | None = None) -> int:
     normalize_parser.add_argument("--g2p", default="rules", choices=sorted(G2P_MODES), help="Pronunciation planner mode")
     normalize_parser.add_argument("--out", help="Output JSON path")
     normalize_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    doctor_parser = subparsers.add_parser("doctor", help="Check the local KVAE runtime and safety configuration")
+    doctor_parser.add_argument("--voice-profile", help="Optional voice profile JSON, audio file, voice folder, or public:<id>")
+    doctor_parser.add_argument("--strict", action="store_true", help="Return a non-zero exit code when warnings are present")
+    doctor_parser.add_argument("--out", help="Output JSON path")
+    doctor_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     cast_parser = subparsers.add_parser("cast", help="Apply a voice acting role to normalized text")
     cast_parser.add_argument("text", nargs="?", help="Display text to normalize and cast")
@@ -173,6 +180,13 @@ def main(argv: list[str] | None = None) -> int:
     native_train_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     args = parser.parse_args(argv)
+    if args.command == "doctor":
+        report = run_doctor(voice_profile_path=args.voice_profile)
+        code = 0
+        if report["status"] == "fail" or (args.strict and report["status"] != "pass"):
+            code = 1
+        _emit(report, out=args.out, compact=args.compact)
+        return code
     if args.command == "normalize":
         script = _build_script(args)
         return _emit(script.to_dict(), out=args.out, compact=args.compact)

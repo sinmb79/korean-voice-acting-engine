@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
@@ -14,8 +15,17 @@ def public_voice_catalog_path() -> Path:
 
 
 def load_public_voice_catalog(path: str | Path | None = None) -> dict[str, Any]:
-    catalog_path = Path(path) if path else public_voice_catalog_path()
-    with catalog_path.open("r", encoding="utf-8") as file:
+    if path:
+        with Path(path).open("r", encoding="utf-8") as file:
+            return json.load(file)
+
+    catalog_path = public_voice_catalog_path()
+    if catalog_path.exists():
+        with catalog_path.open("r", encoding="utf-8") as file:
+            return json.load(file)
+
+    resource = resources.files("kva_engine.resources").joinpath("public_voice_catalog.json")
+    with resource.open("r", encoding="utf-8") as file:
         return json.load(file)
 
 

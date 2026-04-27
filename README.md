@@ -88,6 +88,12 @@ python -m kva_engine public-voices
 python -m kva_engine voice-profile public:mms-tts-kor
 ```
 
+Check the local runtime and safety setup:
+
+```powershell
+python -m kva_engine doctor --voice-profile public:mms-tts-kor
+```
+
 ## Codex Training Workflow
 
 KVAE is intended to be developed and refined through Codex running local commands on the user's machine.
@@ -128,6 +134,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
 - [Professional Voice Product Benchmark Plan](docs/PRO_VOICE_BENCHMARK_PLAN.md)
 - [Public Korean AI Voice Catalog](docs/PUBLIC_VOICE_CATALOG.md)
+- [Release Quality Gates](docs/RELEASE_QUALITY_GATES.md)
 - [Native Training Direction](docs/KVA_NATIVE_TRAINING.md)
 - [Family Voice Training](docs/FAMILY_VOICE_TRAINING.md)
 - [Safety Policy](docs/SAFETY_POLICY.md)
@@ -163,6 +170,7 @@ Current local verification command:
 $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 python -m compileall -q src
+python -m kva_engine doctor --voice-profile public:mms-tts-kor
 ```
 
 ## License
