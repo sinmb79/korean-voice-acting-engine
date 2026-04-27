@@ -1,3 +1,5 @@
+import contextlib
+import io
 import json
 import tempfile
 import unittest
@@ -40,7 +42,9 @@ class DiagnosticsTests(unittest.TestCase):
     def test_doctor_strict_returns_nonzero_on_missing_private_profile(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             missing = Path(temp_dir) / "missing.wav"
-            code = main(["doctor", "--voice-profile", str(missing), "--strict", "--compact"])
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                code = main(["doctor", "--voice-profile", str(missing), "--strict", "--compact"])
 
         self.assertEqual(code, 1)
 

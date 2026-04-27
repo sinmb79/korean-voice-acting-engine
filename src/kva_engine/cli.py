@@ -19,6 +19,7 @@ from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesi
 from kva_engine.training.family_registry import build_family_registry_training_manifest
 from kva_engine.training.native_voice_model import train_native_voice_model
 from kva_engine.voice_profile import load_voice_profile
+from kva_engine.workflows.voice_lab import VOICE_LAB_ROLE_GROUPS, resolve_voice_lab_roles, run_voice_lab_conversion
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -150,6 +151,32 @@ def main(argv: list[str] | None = None) -> int:
     convert_parser.add_argument("--no-normalize", action="store_true", help="Skip ffmpeg loudness normalization")
     convert_parser.add_argument("--dry-run", action="store_true", help="Print the resolved conversion plan without creating audio")
     convert_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    voice_lab_parser = subparsers.add_parser(
+        "voice-lab",
+        help="Create multiple character voice candidates from one recorded performance",
+    )
+    voice_lab_parser.add_argument("--input", required=True, help="Input WAV/M4A/MP3/FLAC performance audio")
+    voice_lab_parser.add_argument("--out-dir", required=True, help="Output folder for WAV, manifests, reviews, and playlist")
+    voice_lab_parser.add_argument(
+        "--roles",
+        default=None,
+        help="Comma-separated role list",
+    )
+    voice_lab_parser.add_argument(
+        "--group",
+        default="default",
+        choices=sorted(VOICE_LAB_ROLE_GROUPS),
+        help="Named role group used when --roles is not provided",
+    )
+    voice_lab_parser.add_argument("--voice-profile", help="Optional voice profile for consent/ownership metadata")
+    voice_lab_parser.add_argument("--expected-text", help="Expected transcript text for review metrics")
+    voice_lab_parser.add_argument("--expected-file", dest="expected_text_path", help="UTF-8 expected transcript file")
+    voice_lab_parser.add_argument("--asr-model", help="Optional Whisper model name for per-sample review")
+    voice_lab_parser.add_argument("--no-review", action="store_true", help="Skip review JSON generation")
+    voice_lab_parser.add_argument("--no-normalize", action="store_true", help="Skip ffmpeg loudness normalization")
+    voice_lab_parser.add_argument("--dry-run", action="store_true", help="Write plans and summaries without creating WAV files")
+    voice_lab_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     train_parser = subparsers.add_parser(
         "train-profile",
@@ -316,6 +343,20 @@ def main(argv: list[str] | None = None) -> int:
             return _emit({"ok": True, "dry_run": True, "conversion_plan": plan.to_dict()}, out=args.json_out, compact=args.compact)
         result = convert_voice_file(plan)
         return _emit(result, out=args.json_out, compact=args.compact)
+    if args.command == "voice-lab":
+        summary = run_voice_lab_conversion(
+            input_path=args.input,
+            output_dir=args.out_dir,
+            roles=resolve_voice_lab_roles(roles=args.roles, group=args.group),
+            voice_profile_path=args.voice_profile,
+            expected_text=args.expected_text,
+            expected_text_path=args.expected_text_path,
+            asr_model=args.asr_model,
+            normalize=not args.no_normalize,
+            review=not args.no_review,
+            dry_run=args.dry_run,
+        )
+        return _emit(summary, out=None, compact=args.compact)
     if args.command == "train-profile":
         manifest = build_family_registry_training_manifest(
             args.registry,

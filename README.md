@@ -23,6 +23,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Local voice profile resolution through `configs/default_voice.local.json`
 - Local render path for VoxCPM-based Korean voice generation
 - Recorded voice conversion through `kva convert`
+- Multi-role voice candidate workflow through `kva voice-lab`
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
 - Built-in public Korean AI voice catalog with source, license, attribution, and AI-voice disclosure metadata
 - Local training manifest and KVA-native statistical voice model preparation
@@ -68,6 +69,17 @@ python -m kva_engine convert `
   --input my_voice.wav `
   --role monster_deep_clear `
   --out outputs\monster.wav
+```
+
+Generate multiple voice candidates from one recording:
+
+```powershell
+python -m kva_engine voice-lab `
+  --input my_voice.wav `
+  --out-dir outputs\voice-lab-demo `
+  --group default `
+  --expected-file script.txt `
+  --asr-model base
 ```
 
 Review the generated audio:
@@ -129,8 +141,10 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 ## Documentation
 
 - [Codex Training Workflow](docs/CODEX_TRAINING_WORKFLOW.md)
+- [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)
 - [KVAE Render Engine](docs/KVAE_RENDER_ENGINE.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
+- [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
 - [Professional Voice Product Benchmark Plan](docs/PRO_VOICE_BENCHMARK_PLAN.md)
 - [Public Korean AI Voice Catalog](docs/PUBLIC_VOICE_CATALOG.md)

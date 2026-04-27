@@ -26,6 +26,7 @@
 - KVA 자체 모델 포맷: `kva.native_voice_model.v1`
 - 보안 환경용 로컬 학습 준비 CLI
 - 녹음 음성 입력 기반 캐릭터 변환 CLI: `kva convert`
+- 한 번의 녹음으로 여러 후보를 만드는 제품형 워크플로: `kva voice-lab`
 - 오디오 품질, ASR, CER/WER 검증 CLI: `kva review-audio`
 - 공개 한국어 AI 음성 카탈로그: 출처, 라이선스, 표기문, AI 음성 고지 포함
 - 테스트 코드와 개발구현서
@@ -63,6 +64,17 @@ python -m kva_engine voice-profile public:mms-tts-kor
 
 ```powershell
 python -m kva_engine doctor --voice-profile public:mms-tts-kor
+```
+
+녹음 파일 하나로 여러 성우/캐릭터 후보를 한 번에 만들 수 있습니다.
+
+```powershell
+python -m kva_engine voice-lab `
+  --input my_voice.wav `
+  --out-dir outputs\voice-lab-demo `
+  --group default `
+  --expected-file script.txt `
+  --asr-model base
 ```
 
 SSML과 생성 manifest도 바로 만들 수 있습니다.
@@ -116,12 +128,14 @@ python -m compileall -q src
 ## 문서
 
 - `docs/CODEX_TRAINING_WORKFLOW.md`: Codex 기반 로컬 학습 워크플로
+- `docs/DEVELOPMENT_ROADMAP.md`: 남은 개발 과정과 완료 기준
 - `docs/DEVELOPMENT_IMPLEMENTATION_SPEC.md`: 전체 개발구현서
 - `docs/RESEARCH_REVIEW.md`: 공개 프로그램, 논문, 국내외 사례 검토
 - `docs/KVA_NATIVE_TRAINING.md`: KVA 네이티브 학습 방향
 - `docs/FAMILY_VOICE_TRAINING.md`: 가족 음성 레지스트리 기반 학습 기록
 - `docs/KVAE_RENDER_ENGINE.md`: 로컬 VoxCPM 렌더 경로
 - `docs/KVAE_CONVERT_ENGINE.md`: 녹음 음성 입력 기반 캐릭터 변환 경로
+- `docs/VOICE_LAB_WORKFLOW.md`: 한 번의 녹음에서 여러 목소리 후보 생성
 - `docs/KVAE_REVIEW_ENGINE.md`: 오디오 품질, ASR, WER/CER 검증 경로
 - `docs/PUBLIC_VOICE_CATALOG.md`: 공개 한국어 AI 음성 카탈로그
 - `docs/RELEASE_QUALITY_GATES.md`: 릴리스 품질 게이트
