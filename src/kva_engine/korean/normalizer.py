@@ -10,10 +10,13 @@ from kva_engine.korean.english_reader import (
     apply_english_terms,
     apply_unknown_acronyms,
 )
+from kva_engine.korean.date_time_reader import normalize_datetime
+from kva_engine.korean.g2p_adapter import apply_g2p
+from kva_engine.korean.josa import trace_josa_after_terms
 from kva_engine.korean.number_reader import normalize_numbers
-from kva_engine.korean.pronunciation import plan_pronunciation
 from kva_engine.korean.prosody import split_phrases
 from kva_engine.korean.symbol_reader import normalize_symbols
+from kva_engine.korean.telephone_reader import normalize_telephone
 from kva_engine.schemas import NormalizationTrace, SpeechScript, SpeechToken
 
 
@@ -32,6 +35,7 @@ def normalize_text(
     display_text: str,
     *,
     pronunciation_dict: dict[str, Any] | None = None,
+    g2p_mode: str = "rules",
 ) -> SpeechScript:
     pronunciation_dict = pronunciation_dict or {}
     custom_terms = pronunciation_dict.get("terms", {})
@@ -42,18 +46,26 @@ def normalize_text(
     traces.extend(new_traces)
     speech_text, new_traces = apply_english_terms(speech_text, custom_terms=custom_terms)
     traces.extend(new_traces)
+    term_outputs = {trace.output for trace in new_traces if trace.kind == "term"}
+    term_outputs.update(output.split()[-1] for output in list(term_outputs) if output.split())
+    speech_text, new_traces = normalize_telephone(speech_text)
+    traces.extend(new_traces)
+    speech_text, new_traces = normalize_datetime(speech_text)
+    traces.extend(new_traces)
     speech_text, new_traces = normalize_symbols(speech_text)
     traces.extend(new_traces)
     speech_text, new_traces = normalize_numbers(speech_text)
     traces.extend(new_traces)
     speech_text, new_traces = apply_unknown_acronyms(speech_text)
     traces.extend(new_traces)
+    traces.extend(trace_josa_after_terms(speech_text, term_outputs=term_outputs))
 
     speech_text = _clean_spacing(speech_text)
-    phoneme_text, pronunciation_traces = plan_pronunciation(speech_text)
+    phoneme_text, pronunciation_traces, g2p_warnings = apply_g2p(speech_text, mode=g2p_mode)
     traces.extend(pronunciation_traces)
 
     warnings = _build_warnings(speech_text)
+    warnings.extend(g2p_warnings)
     return SpeechScript(
         display_text=display_text,
         speech_text=speech_text,
@@ -65,9 +77,14 @@ def normalize_text(
     )
 
 
-def normalize_file(path: str | Path, *, pronunciation_dict: dict[str, Any] | None = None) -> SpeechScript:
+def normalize_file(
+    path: str | Path,
+    *,
+    pronunciation_dict: dict[str, Any] | None = None,
+    g2p_mode: str = "rules",
+) -> SpeechScript:
     text = Path(path).read_text(encoding="utf-8")
-    return normalize_text(text.strip(), pronunciation_dict=pronunciation_dict)
+    return normalize_text(text.strip(), pronunciation_dict=pronunciation_dict, g2p_mode=g2p_mode)
 
 
 def _clean_spacing(text: str) -> str:
@@ -96,4 +113,3 @@ def _build_warnings(speech_text: str) -> list[str]:
     if len(speech_text.split()) <= 3:
         warnings.append("very_short_input_may_be_unstable")
     return warnings
-

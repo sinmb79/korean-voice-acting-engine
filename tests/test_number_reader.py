@@ -1,6 +1,12 @@
 import unittest
 
-from kva_engine.korean.number_reader import normalize_numbers, read_decimal, read_digits, read_int_sino
+from kva_engine.korean.number_reader import (
+    normalize_numbers,
+    read_counter_number,
+    read_decimal,
+    read_digits,
+    read_int_sino,
+)
 
 
 class NumberReaderTests(unittest.TestCase):
@@ -14,9 +20,14 @@ class NumberReaderTests(unittest.TestCase):
     def test_phone_digits_use_gong_for_zero(self):
         self.assertEqual(read_digits("010", zero="공"), "공일공")
 
+    def test_counter_number_uses_attributive_native_form(self):
+        self.assertEqual(read_counter_number(3), "세")
+        self.assertEqual(read_counter_number(20), "스무")
+        self.assertEqual(read_counter_number(21), "스물한")
+
     def test_normalize_mixed_numbers(self):
         text, traces = normalize_numbers("2026년 4월 27일 3.5초 v2.1 010-1234-5678")
-        self.assertIn("이천이십육 년", text)
+        self.assertIn("이천이십육년", text)
         self.assertIn("사월 이십칠일", text)
         self.assertIn("삼 점 오 초", text)
         self.assertIn("버전 이 점 일", text)
@@ -24,8 +35,8 @@ class NumberReaderTests(unittest.TestCase):
         self.assertGreaterEqual(len(traces), 5)
 
     def test_version_with_korean_josa(self):
-        text, _ = normalize_numbers("v2.1을 테스트했다")
-        self.assertEqual(text, "버전 이 점 일을 테스트했다")
+        text, _ = normalize_numbers("v2.1을 테스트했습니다.")
+        self.assertEqual(text, "버전 이 점 일을 테스트했습니다.")
 
     def test_currency_and_percent(self):
         text, _ = normalize_numbers("$500 30%")

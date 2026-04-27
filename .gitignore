@@ -12,6 +12,7 @@ outputs/*
 !outputs/.gitkeep
 
 # Sensitive voice assets and model artifacts
+configs/*.local.json
 profiles/
 voice_profiles/
 recordings/
@@ -31,4 +32,3 @@ checkpoints/
 # Local environment
 .env
 .env.*
-

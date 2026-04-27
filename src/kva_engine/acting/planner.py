@@ -6,9 +6,14 @@ from kva_engine.acting.presets import get_preset
 from kva_engine.schemas import SpeechScript
 
 
-def plan_voice_acting(script: SpeechScript, *, role: str = "calm_narrator") -> dict[str, Any]:
+def plan_voice_acting(
+    script: SpeechScript,
+    *,
+    role: str = "calm_narrator",
+    voice_profile: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     preset = get_preset(role)
-    return {
+    plan = {
         "display_text": script.display_text,
         "speech_text": script.speech_text,
         "phoneme_text": script.phoneme_text,
@@ -16,4 +21,6 @@ def plan_voice_acting(script: SpeechScript, *, role: str = "calm_narrator") -> d
         "phrases": [phrase.to_dict() for phrase in script.phrases],
         "warnings": script.warnings,
     }
-
+    if voice_profile:
+        plan["voice_profile"] = voice_profile
+    return plan

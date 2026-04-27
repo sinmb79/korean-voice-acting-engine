@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 
 from kva_engine.schemas import NormalizationTrace
 
@@ -8,34 +9,63 @@ from kva_engine.schemas import NormalizationTrace
 SINO_DIGITS = ["영", "일", "이", "삼", "사", "오", "육", "칠", "팔", "구"]
 SMALL_UNITS = ["", "십", "백", "천"]
 BIG_UNITS = ["", "만", "억", "조", "경"]
-NATIVE_NUMBERS = {
-    1: "한",
-    2: "두",
-    3: "세",
-    4: "네",
+
+NATIVE_ONES = {
+    1: "하나",
+    2: "둘",
+    3: "셋",
+    4: "넷",
     5: "다섯",
     6: "여섯",
     7: "일곱",
     8: "여덟",
     9: "아홉",
     10: "열",
-    11: "열한",
-    12: "열두",
-    13: "열세",
-    14: "열네",
+    11: "열하나",
+    12: "열둘",
+    13: "열셋",
+    14: "열넷",
     15: "열다섯",
     16: "열여섯",
     17: "열일곱",
     18: "열여덟",
     19: "열아홉",
+}
+NATIVE_TENS = {
+    20: "스물",
+    30: "서른",
+    40: "마흔",
+    50: "쉰",
+    60: "예순",
+    70: "일흔",
+    80: "여든",
+    90: "아흔",
+}
+COUNTER_FORMS = {
+    1: "한",
+    2: "두",
+    3: "세",
+    4: "네",
     20: "스무",
 }
 
-COUNT_UNITS = {"개", "명", "번", "살", "권", "마리"}
+COUNT_UNITS = {
+    "개",
+    "명",
+    "번",
+    "살",
+    "권",
+    "마리",
+    "장",
+    "잔",
+    "대",
+    "줄",
+}
 SINO_UNIT_SUFFIXES = {
     "년",
     "월",
     "일",
+    "시",
     "분",
     "초",
     "원",
@@ -43,9 +73,9 @@ SINO_UNIT_SUFFIXES = {
     "퍼센트",
     "단계",
     "배",
-    "장",
-    "절",
+    "쪽",
     "페이지",
+    "위",
 }
 
 
@@ -82,8 +112,27 @@ def _read_under_10000(value: int) -> str:
 
 
 def read_int_native(value: int) -> str:
-    if value in NATIVE_NUMBERS:
-        return NATIVE_NUMBERS[value]
+    if value in NATIVE_ONES:
+        return NATIVE_ONES[value]
+    if value in NATIVE_TENS:
+        return NATIVE_TENS[value]
+    if 20 < value < 100:
+        tens = value // 10 * 10
+        ones = value % 10
+        return NATIVE_TENS[tens] + NATIVE_ONES[ones]
+    return read_int_sino(value)
+
+
+def read_counter_number(value: int) -> str:
+    if value in COUNTER_FORMS:
+        return COUNTER_FORMS[value]
+    if 20 < value < 100:
+        tens = value // 10 * 10
+        ones = value % 10
+        if ones in COUNTER_FORMS:
+            return NATIVE_TENS[tens] + COUNTER_FORMS[ones]
+    if value in NATIVE_ONES or value in NATIVE_TENS:
+        return read_int_native(value)
     return read_int_sino(value)
 
 
@@ -99,18 +148,18 @@ def read_decimal(source: str) -> str:
 
 def read_number_with_unit(number: int, unit: str) -> str:
     if unit in COUNT_UNITS:
-        return f"{read_int_native(number)} {unit}"
+        return f"{read_counter_number(number)} {unit}"
     return f"{read_int_sino(number)} {unit}"
 
 
 def normalize_numbers(text: str) -> tuple[str, list[NormalizationTrace]]:
     traces: list[NormalizationTrace] = []
-    rules: list[tuple[re.Pattern[str], str, callable]] = [
+    rules: list[tuple[re.Pattern[str], str, Callable[[re.Match[str]], str]]] = [
         (re.compile(r"\b(0\d{1,2}-\d{3,4}-\d{4})\b"), "telephone", _replace_phone),
         (re.compile(r"\$([0-9][0-9,]*)"), "currency_usd", _replace_usd),
+        (re.compile(r"₩([0-9][0-9,]*)"), "currency_krw", _replace_krw),
         (re.compile(r"\b[vV](\d+(?:\.\d+)+)([가-힣]*)"), "version_number", _replace_version),
-        (re.compile(r"(\d+):(\d+)"), "score", _replace_score),
-        (re.compile(r"(\d+)-(\d+)(단계|구간|회차)"), "range_with_unit", _replace_range),
+        (re.compile(r"(\d+)-(\d+)(단계|구간|차|위|개|명|쪽|페이지)"), "range_with_unit", _replace_range),
         (re.compile(r"(\d{4})년"), "year", _replace_year),
         (re.compile(r"(\d{1,2})월\s*(\d{1,2})일"), "month_day", _replace_month_day),
         (re.compile(r"(\d{1,2})시\s*(?:(\d{1,2})분)?"), "time", _replace_time),
@@ -123,7 +172,7 @@ def normalize_numbers(text: str) -> tuple[str, list[NormalizationTrace]]:
 
     for pattern, rule, callback in rules:
 
-        def replace(match: re.Match[str], *, current_rule: str = rule, current_callback: callable = callback) -> str:
+        def replace(match: re.Match[str], *, current_rule: str = rule, current_callback: Callable[[re.Match[str]], str] = callback) -> str:
             source = match.group(0)
             output = current_callback(match)
             traces.append(
@@ -153,13 +202,13 @@ def _replace_usd(match: re.Match[str]) -> str:
     return f"{read_int_sino(_clean_int(match.group(1)))} 달러"
 
 
+def _replace_krw(match: re.Match[str]) -> str:
+    return f"{read_int_sino(_clean_int(match.group(1)))} 원"
+
+
 def _replace_version(match: re.Match[str]) -> str:
     suffix = match.group(2) or ""
     return "버전 " + read_decimal(match.group(1)) + suffix
-
-
-def _replace_score(match: re.Match[str]) -> str:
-    return f"{read_int_sino(int(match.group(1)))} 대 {read_int_sino(int(match.group(2)))}"
 
 
 def _replace_range(match: re.Match[str]) -> str:
@@ -168,7 +217,7 @@ def _replace_range(match: re.Match[str]) -> str:
 
 
 def _replace_year(match: re.Match[str]) -> str:
-    return f"{read_int_sino(int(match.group(1)))} 년"
+    return f"{read_int_sino(int(match.group(1)))}년"
 
 
 def _replace_month_day(match: re.Match[str]) -> str:
@@ -179,7 +228,7 @@ def _replace_month_day(match: re.Match[str]) -> str:
 def _replace_time(match: re.Match[str]) -> str:
     hour = int(match.group(1))
     minute = match.group(2)
-    hour_text = read_int_native(hour) if 1 <= hour <= 12 else read_int_sino(hour)
+    hour_text = read_counter_number(hour) if 1 <= hour <= 12 else read_int_sino(hour)
     if minute is None:
         return f"{hour_text} 시"
     return f"{hour_text} 시 {read_int_sino(int(minute))} 분"

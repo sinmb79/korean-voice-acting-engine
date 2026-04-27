@@ -9,6 +9,8 @@ SYMBOLS = {
     "#": "샵",
     "+": "플러스",
     "=": "는",
+    "/": "슬래시",
+    "\\": "역슬래시",
 }
 
 
@@ -26,6 +28,4 @@ def normalize_symbols(text: str) -> tuple[str, list[NormalizationTrace]]:
                 kind="symbol",
             )
         )
-    text = text.replace("%", " 퍼센트")
     return text, traces
-

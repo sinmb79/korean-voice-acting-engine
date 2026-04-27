@@ -30,7 +30,7 @@ def _split_long_sentence(sentence: str, *, max_chars: int) -> list[SpeechPhrase]
         current.append(word)
         candidate = " ".join(current)
         if len(candidate) >= max_chars or word.endswith((",", "，", ";", "；")):
-            chunks.append(SpeechPhrase(text=candidate.rstrip(","), pause_after_sec=0.18))
+            chunks.append(SpeechPhrase(text=candidate.rstrip(",，"), pause_after_sec=0.18))
             current = []
     if current:
         chunks.append(SpeechPhrase(text=" ".join(current), pause_after_sec=_pause_for_sentence(sentence)))
@@ -43,4 +43,3 @@ def _pause_for_sentence(sentence: str) -> float:
     if sentence.endswith(("!", "！")):
         return 0.28
     return 0.35
-

@@ -1,2 +1,1 @@
-OpenAI API는 3.5초 안에 응답했다. 22B Labs는 TTS v2.1을 테스트했다.
-
+OpenAI API는 3.5초 안에 응답합니다. 22B Labs는 TTS v2.1을 테스트했습니다.

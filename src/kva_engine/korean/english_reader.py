@@ -24,6 +24,10 @@ DEFAULT_TERMS: dict[str, str] = {
     "CLI": "씨엘아이",
     "MVP": "엠브이피",
     "ONNX": "오닉스",
+    "VoxCPM": "복스씨피엠",
+    "g2pK": "지투피케이",
+    "CoreaSpeech": "코리아스피치",
+    "VibeVoice": "바이브보이스",
 }
 
 LETTER_NAMES: dict[str, str] = {
@@ -44,7 +48,7 @@ LETTER_NAMES: dict[str, str] = {
     "O": "오",
     "P": "피",
     "Q": "큐",
-    "R": "알",
+    "R": "아르",
     "S": "에스",
     "T": "티",
     "U": "유",
@@ -134,4 +138,3 @@ def apply_unknown_acronyms(text: str) -> tuple[str, list[NormalizationTrace]]:
         return output
 
     return ASCII_TOKEN_RE.sub(replace, text), traces
-

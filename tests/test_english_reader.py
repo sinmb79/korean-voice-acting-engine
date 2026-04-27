@@ -5,8 +5,8 @@ from kva_engine.korean.english_reader import apply_dotted_spelling, apply_englis
 
 class EnglishReaderTests(unittest.TestCase):
     def test_known_terms_are_replaced(self):
-        text, traces = apply_english_terms("OpenAI API와 TTS")
-        self.assertEqual(text, "오픈에이아이 에이피아이와 티티에스")
+        text, traces = apply_english_terms("OpenAI API는 TTS")
+        self.assertEqual(text, "오픈에이아이 에이피아이는 티티에스")
         self.assertEqual([trace.source for trace in traces], ["OpenAI", "API", "TTS"])
 
     def test_custom_terms_override_default_terms(self):
@@ -15,7 +15,7 @@ class EnglishReaderTests(unittest.TestCase):
 
     def test_dotted_spelling_is_slow_reading_friendly(self):
         text, traces = apply_dotted_spelling("M.A.R.I.A.")
-        self.assertEqual(text, "엠, 에이, 알, 아이, 에이")
+        self.assertEqual(text, "엠, 에이, 아르, 아이, 에이")
         self.assertEqual(traces[0].rule, "dotted_spelling")
 
     def test_unknown_acronym_is_spelled(self):
@@ -26,4 +26,3 @@ class EnglishReaderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
