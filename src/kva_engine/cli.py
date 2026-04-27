@@ -9,6 +9,7 @@ from kva_engine.acting.planner import plan_voice_acting
 from kva_engine.acting.presets import PRESETS
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
+from kva_engine.public_voices import get_public_voice, list_public_voices, load_public_voice_catalog, public_voice_profile
 from kva_engine.review.audio_review import recording_check, review_audio
 from kva_engine.review.manifest import build_generation_manifest
 from kva_engine.ssml import speech_script_to_ssml
@@ -48,6 +49,26 @@ def main(argv: list[str] | None = None) -> int:
     voice_profile_parser.add_argument("path", nargs="?", help="Optional profile JSON, audio file, or voice folder")
     voice_profile_parser.add_argument("--out", help="Output JSON path")
     voice_profile_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    public_voices_parser = subparsers.add_parser("public-voices", help="List built-in public Korean AI voice options")
+    public_voices_parser.add_argument("--id", dest="voice_id", help="Show one public voice by id")
+    public_voices_parser.add_argument(
+        "--profile",
+        action="store_true",
+        help="Return a KVAE voice profile for --id, usable as public:<id>",
+    )
+    public_voices_parser.add_argument(
+        "--include-experimental",
+        action="store_true",
+        help="Include entries that require manual license/provenance review",
+    )
+    public_voices_parser.add_argument(
+        "--commercial-only",
+        action="store_true",
+        help="Only show entries explicitly marked as commercially usable",
+    )
+    public_voices_parser.add_argument("--out", help="Output JSON path")
+    public_voices_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     ssml_parser = subparsers.add_parser("ssml", help="Create SSML from Korean-normalized text")
     ssml_parser.add_argument("text", nargs="?", help="Display text to normalize")
@@ -163,6 +184,26 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "voice-profile":
         profile = load_voice_profile(args.path)
         return _emit({"voice_profile": profile}, out=args.out, compact=args.compact)
+    if args.command == "public-voices":
+        if args.voice_id and args.profile:
+            return _emit({"voice_profile": public_voice_profile(args.voice_id)}, out=args.out, compact=args.compact)
+        if args.voice_id:
+            return _emit({"voice": get_public_voice(args.voice_id)}, out=args.out, compact=args.compact)
+        catalog = load_public_voice_catalog()
+        voices = list_public_voices(
+            include_experimental=args.include_experimental,
+            commercial_only=args.commercial_only,
+        )
+        return _emit(
+            {
+                "catalog_version": catalog.get("catalog_version"),
+                "title": catalog.get("title"),
+                "disclosure": catalog.get("disclosure"),
+                "voices": voices,
+            },
+            out=args.out,
+            compact=args.compact,
+        )
     if args.command == "ssml":
         script = _build_script(args)
         return _emit(

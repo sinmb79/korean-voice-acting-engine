@@ -24,6 +24,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Local render path for VoxCPM-based Korean voice generation
 - Recorded voice conversion through `kva convert`
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
+- Built-in public Korean AI voice catalog with source, license, attribution, and AI-voice disclosure metadata
 - Local training manifest and KVA-native statistical voice model preparation
 - Safety-oriented manifests for consent, privacy, and redistribution boundaries
 
@@ -80,6 +81,13 @@ python -m kva_engine review-audio `
   --out outputs\monster.review.json
 ```
 
+List public Korean AI voice options:
+
+```powershell
+python -m kva_engine public-voices
+python -m kva_engine voice-profile public:mms-tts-kor
+```
+
 ## Codex Training Workflow
 
 KVAE is intended to be developed and refined through Codex running local commands on the user's machine.
@@ -119,6 +127,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
 - [Professional Voice Product Benchmark Plan](docs/PRO_VOICE_BENCHMARK_PLAN.md)
+- [Public Korean AI Voice Catalog](docs/PUBLIC_VOICE_CATALOG.md)
 - [Native Training Direction](docs/KVA_NATIVE_TRAINING.md)
 - [Family Voice Training](docs/FAMILY_VOICE_TRAINING.md)
 - [Safety Policy](docs/SAFETY_POLICY.md)

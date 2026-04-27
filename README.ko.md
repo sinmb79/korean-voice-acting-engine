@@ -27,6 +27,7 @@
 - 보안 환경용 로컬 학습 준비 CLI
 - 녹음 음성 입력 기반 캐릭터 변환 CLI: `kva convert`
 - 오디오 품질, ASR, CER/WER 검증 CLI: `kva review-audio`
+- 공개 한국어 AI 음성 카탈로그: 출처, 라이선스, 표기문, AI 음성 고지 포함
 - 테스트 코드와 개발구현서
 
 ## 빠르게 실행하기
@@ -49,6 +50,13 @@ python -m kva_engine cast --file data\sample_input.txt --role old_storyteller --
 
 ```powershell
 python -m kva_engine voice-profile
+```
+
+공개 한국어 AI 음성 후보는 아래처럼 확인합니다.
+
+```powershell
+python -m kva_engine public-voices
+python -m kva_engine voice-profile public:mms-tts-kor
 ```
 
 SSML과 생성 manifest도 바로 만들 수 있습니다.
@@ -109,6 +117,7 @@ python -m compileall -q src
 - `docs/KVAE_RENDER_ENGINE.md`: 로컬 VoxCPM 렌더 경로
 - `docs/KVAE_CONVERT_ENGINE.md`: 녹음 음성 입력 기반 캐릭터 변환 경로
 - `docs/KVAE_REVIEW_ENGINE.md`: 오디오 품질, ASR, WER/CER 검증 경로
+- `docs/PUBLIC_VOICE_CATALOG.md`: 공개 한국어 AI 음성 카탈로그
 - `docs/SAFETY_POLICY.md`: 음성/동의/공개 정책
 - `docs/SECURE_DEVELOPMENT.md`: 보안 환경 개발 원칙
 

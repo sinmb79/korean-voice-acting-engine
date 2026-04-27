@@ -5,9 +5,12 @@ import os
 from pathlib import Path
 from typing import Any
 
+from kva_engine.public_voices import public_voice_profile
+
 
 VOICE_PROFILE_ENV = "KVA_DEFAULT_VOICE_PROFILE"
 AUDIO_SUFFIXES = (".wav", ".m4a", ".mp3", ".flac")
+PUBLIC_VOICE_PREFIX = "public:"
 
 
 def repo_root() -> Path:
@@ -19,6 +22,9 @@ def default_local_voice_config() -> Path:
 
 
 def load_voice_profile(path: str | Path | None = None) -> dict[str, Any] | None:
+    if isinstance(path, str) and path.startswith(PUBLIC_VOICE_PREFIX):
+        return public_voice_profile(path)
+
     profile_path = Path(path) if path else _default_profile_path()
     if profile_path is None:
         return None

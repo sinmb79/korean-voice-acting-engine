@@ -23,6 +23,7 @@ KVA Engine은 실제 사람의 목소리를 무단 복제하기 위한 도구가
 
 - voice profile 생성 시 consent manifest 요구
 - 생성 결과에 AI-generated metadata 포함
+- 공개 AI 음성 사용 시 source, license, attribution, AI voice disclosure를 manifest에 포함
 - 워터마크 또는 disclosure hook 제공
 - 개인 음성 원본과 개인 모델은 저장소에 포함하지 않음
 - 데이터셋별 allowed_use 확인
@@ -30,4 +31,3 @@ KVA Engine은 실제 사람의 목소리를 무단 복제하기 위한 도구가
 ## 공개 배포 기본값
 
 초기 공개 버전은 한국어 전처리와 성우 planning 중심으로 배포한다. 개인 음성 학습과 고품질 합성 모델은 안전 장치가 구현된 뒤 단계적으로 연다.
-
