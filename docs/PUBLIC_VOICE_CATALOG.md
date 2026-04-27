@@ -34,6 +34,18 @@ python -m kva_engine public-voices --id mms-tts-kor --profile
 python -m kva_engine voice-profile public:mms-tts-kor
 ```
 
+Create a license-safe install plan:
+
+```powershell
+python -m kva_engine public-voices `
+  --id mms-tts-kor `
+  --install-plan `
+  --install-root C:\kvae-public-voices `
+  --out outputs\mms-tts-kor.install-plan.json
+```
+
+KVAE does not download external model files automatically. The plan records source, license, attribution, disclosure, target folder, warnings, and suggested manual commands.
+
 Include entries that require manual review:
 
 ```powershell

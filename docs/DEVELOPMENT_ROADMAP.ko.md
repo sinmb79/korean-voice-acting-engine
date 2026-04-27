@@ -12,6 +12,7 @@
 - SSML 및 manifest 생성
 - private local voice와 public AI voice profile 해석
 - 출처, 라이선스, 표기문, AI 음성 고지를 포함한 공개 한국어 AI 음성 카탈로그
+- `kva public-voices --install-plan` 기반 라이선스 안전 공개 음성 설치 계획
 - `kva convert` 기반 녹음 음성 변환
 - `kva voice-lab` 기반 다중 캐릭터 후보 생성
 - `default`, `dialogue`, `creature`, `narration`, `shorts` Voice Lab role group
@@ -42,7 +43,7 @@
 
 ### Phase 2. 공개 음성 설치 및 렌더 어댑터
 
-상태: 메타데이터 카탈로그 구현 완료, 실제 설치/렌더 어댑터는 남음.
+상태: 메타데이터 카탈로그와 설치 계획 구현 완료, 실제 렌더 어댑터는 남음.
 
 목표:
 
@@ -52,7 +53,6 @@
 
 필요:
 
-- `public-voices install-plan`
 - MMS, Piper, Coqui 등 provider adapter
 - 사용자가 선택한 로컬 폴더 아래 offline cache 구조
 

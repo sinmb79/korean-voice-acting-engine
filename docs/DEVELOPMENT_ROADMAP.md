@@ -12,6 +12,7 @@ Done:
 - SSML and manifest generation
 - voice profile resolution for private local voices and public AI voices
 - public Korean AI voice catalog with source, license, attribution, and AI disclosure metadata
+- license-safe public voice install plans through `kva public-voices --install-plan`
 - deterministic recorded-voice conversion through `kva convert`
 - multi-role candidate generation through `kva voice-lab`
 - named Voice Lab role groups: `default`, `dialogue`, `creature`, `narration`, `shorts`
@@ -42,7 +43,7 @@ Next refinements:
 
 ### Phase 2. Public Voice Install And Render Adapters
 
-Status: metadata catalog implemented; install/render adapters still missing.
+Status: metadata catalog and install plans implemented; actual render adapters still missing.
 
 Goal:
 
@@ -52,7 +53,6 @@ Goal:
 
 Needed:
 
-- `public-voices install-plan`
 - provider adapters for MMS, Piper, Coqui, and other license-safe models
 - offline cache layout under a user-selected local folder
 

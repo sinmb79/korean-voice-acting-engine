@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from kva_engine.cli import main
-from kva_engine.public_voices import get_public_voice, list_public_voices, public_voice_profile
+from kva_engine.public_voices import build_public_voice_install_plan, get_public_voice, list_public_voices, public_voice_profile
 from kva_engine.voice_profile import load_voice_profile
 
 
@@ -61,6 +61,37 @@ class PublicVoicesTests(unittest.TestCase):
 
         self.assertEqual(code, 0)
         self.assertEqual(payload["voice_profile"]["id"], "public:mms-tts-kor")
+
+    def test_public_voice_install_plan_is_license_safe(self):
+        plan = build_public_voice_install_plan("mms-tts-kor", install_root="C:/kvae-cache")
+
+        self.assertEqual(plan["status"], "plan_only")
+        self.assertFalse(plan["download_is_automatic"])
+        self.assertTrue(plan["license_ack_required"])
+        self.assertIn("non_commercial_or_commercial_use_not_confirmed", plan["warnings"])
+        self.assertIn("huggingface-cli download facebook/mms-tts-kor", plan["suggested_steps"][2]["suggested_command"])
+
+    def test_public_voices_cli_can_return_install_plan(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            out_path = Path(temp_dir) / "install_plan.json"
+            code = main(
+                [
+                    "public-voices",
+                    "--id",
+                    "neurlang-piper-kss-korean",
+                    "--install-plan",
+                    "--install-root",
+                    str(Path(temp_dir) / "cache"),
+                    "--out",
+                    str(out_path),
+                    "--compact",
+                ]
+            )
+            payload = json.loads(out_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(code, 0)
+        self.assertEqual(payload["install_plan"]["voice_id"], "neurlang-piper-kss-korean")
+        self.assertFalse(payload["install_plan"]["download_is_automatic"])
 
     def test_manual_review_entries_are_hidden_by_default(self):
         default_ids = {voice["id"] for voice in list_public_voices()}

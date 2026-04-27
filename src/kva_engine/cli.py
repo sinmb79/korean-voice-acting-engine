@@ -10,7 +10,13 @@ from kva_engine.acting.presets import PRESETS
 from kva_engine.diagnostics import run_doctor
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
-from kva_engine.public_voices import get_public_voice, list_public_voices, load_public_voice_catalog, public_voice_profile
+from kva_engine.public_voices import (
+    build_public_voice_install_plan,
+    get_public_voice,
+    list_public_voices,
+    load_public_voice_catalog,
+    public_voice_profile,
+)
 from kva_engine.review.audio_review import recording_check, review_audio
 from kva_engine.review.manifest import build_generation_manifest
 from kva_engine.ssml import speech_script_to_ssml
@@ -60,6 +66,8 @@ def main(argv: list[str] | None = None) -> int:
 
     public_voices_parser = subparsers.add_parser("public-voices", help="List built-in public Korean AI voice options")
     public_voices_parser.add_argument("--id", dest="voice_id", help="Show one public voice by id")
+    public_voices_parser.add_argument("--install-plan", action="store_true", help="Return a license-safe install plan for --id")
+    public_voices_parser.add_argument("--install-root", help="Local cache root for --install-plan")
     public_voices_parser.add_argument(
         "--profile",
         action="store_true",
@@ -226,6 +234,14 @@ def main(argv: list[str] | None = None) -> int:
         profile = load_voice_profile(args.path)
         return _emit({"voice_profile": profile}, out=args.out, compact=args.compact)
     if args.command == "public-voices":
+        if args.install_plan:
+            if not args.voice_id:
+                raise SystemExit("--install-plan requires --id.")
+            return _emit(
+                {"install_plan": build_public_voice_install_plan(args.voice_id, install_root=args.install_root)},
+                out=args.out,
+                compact=args.compact,
+            )
         if args.voice_id and args.profile:
             return _emit({"voice_profile": public_voice_profile(args.voice_id)}, out=args.out, compact=args.compact)
         if args.voice_id:
