@@ -17,6 +17,9 @@ Done:
 - multi-role candidate generation through `kva voice-lab`
 - source-filter vocal tract voice design through `kva vocal-tract`
 - professional voice product benchmark reporting through `kva benchmarks`
+- major-studio voice acting and sound-design technique catalog through `kva benchmarks`
+- license-safe source-library schema through `kva source-library`
+- creature sound-design recipes through `kva creature-design`
 - nonhuman bioacoustic dinosaur rendering that removes audible source-speaker identity
 - named Voice Lab role groups: `default`, `dialogue`, `creature`, `narration`, `shorts`
 - audio review through `kva review-audio`
@@ -98,7 +101,28 @@ Needed:
 
 - backend-specific dataset export formats
 
-### Phase 5. Local App UI
+### Phase 5. Creator Sound Design Engine
+
+Status: benchmark catalog and recipe CLI started; full source-library workflow and audio-layer renderer still missing.
+
+Goal:
+
+- benchmark how major studios build voices and sound effects
+- turn those methods into a free Korean-friendly creator workflow
+- keep every source layer license-safe and attributable
+- separate human character conversion from fully nonhuman creature design
+- let one private performance guide timing and energy without leaking identity when the target is nonhuman
+
+Needed:
+
+- `kva source-library add/scan/validate`
+- waveform indexing, tags, and source provenance checks
+- `kva creature-design render` for animal/Foley/synthetic layer mixing
+- Foley and action spotting for video clips
+- A/B/C candidate generation plus human listening score
+- local UI for compare, bypass, source/license display, and export
+
+### Phase 6. Local App UI
 
 Status: CLI only.
 
@@ -117,7 +141,7 @@ Needed:
 - role preset editor
 - review dashboard
 
-### Phase 6. Release Packaging
+### Phase 7. Release Packaging
 
 Status: wheel build smoke passed; full release workflow still needed.
 

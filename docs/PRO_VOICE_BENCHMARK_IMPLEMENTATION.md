@@ -11,11 +11,13 @@ flowchart LR
   E["ElevenLabs / Altered / OpenVoice"] --> F["Performance-preserving speech-to-speech"]
   G["Voicemod"] --> H["Fast presets and compare UX"]
   I["Respeecher"] --> J["Consent and safety workflow"]
+  L["Major studio sound design"] --> M["Foley, animal, synthetic layers"]
   B --> K["KVAE"]
   D --> K
   F --> K
   H --> K
   J --> K
+  M --> K
 ```
 
 ## Program Command
@@ -37,6 +39,7 @@ The command returns the product lessons, what KVAE already adopted, and what rem
 - Voicemod: one-click presets, customization sliders, bypass/compare UX.
 - OpenVoice: separate tone color from style controls such as rhythm, pauses, emotion, and intonation.
 - Respeecher: make consent, disclosure, and safety metadata part of the workflow.
+- Major studio creature workflows: use acting intent, source recording, Foley, animal, synthetic, transformation, mix, and review instead of only lowering a human voice.
 
 ## KVAE Interpretation
 
@@ -57,6 +60,31 @@ KVAE models that as:
 - `kva voice-lab`: multiple role candidates, playlist, manifests, review files
 - `kva review-audio`: objective quality gates
 - `kva benchmarks`: product benchmark report
+- `kva source-library`: source provenance, license, privacy, and AI/synthetic disclosure schema
+- `kva creature-design`: studio-style creature layer recipe
+
+## Major Studio Sound Design Benchmark
+
+KVAE now treats studio sound design as a program requirement, not only a research note.
+
+Benchmarked lessons:
+
+- creature voices are often composites, not one human voice lowered in pitch
+- animal recordings can provide believable living cues
+- Foley gives body, movement, contact, weight, and texture
+- synthetic resonators and noise layers can create impossible anatomy safely
+- transformation chains should be explicit and repeatable
+- every source layer needs provenance, license, attribution, and AI/synthetic disclosure
+- final quality requires candidate comparison and human listening review
+
+Current implementation:
+
+```powershell
+python -m kva_engine source-library --compact
+python -m kva_engine creature-design --role dinosaur_giant_roar --compact
+```
+
+The dinosaur recipe explicitly requires `source_speech_audible=false` and `source_voice_identity_retained=false`.
 
 ## Dinosaur Voice Fix
 

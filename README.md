@@ -6,6 +6,8 @@ Korean Voice Acting Engine, or KVAE, is a local-first voice acting toolkit for K
 
 The long-term goal is simple: a user records their own Korean voice, Codex helps prepare and refine the local training assets, and KVAE expands that voice into narrator, teacher, villain, child, wolf, monster, dinosaur, and other character performances.
 
+KVAE also aims to turn major-studio voice and sound-design workflows into a free creator tool. The engine should not copy copyrighted studio sounds; it should reproduce the method: acting direction, source collection, Foley, animal/synthetic layers, transformation, mixing, review, attribution, and disclosure.
+
 ## Why This Exists
 
 Most text-to-speech systems can read text. KVAE is trying to do something more specific: understand Korean first, preserve the speaker's consent and ownership, and then apply voice acting roles in a repeatable local workflow.
@@ -26,6 +28,9 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Multi-role voice candidate workflow through `kva voice-lab`
 - Source-filter vocal tract voice designs through `kva vocal-tract`
 - Bioacoustic dinosaur rendering that removes audible source-speaker identity for fully nonhuman roles
+- Studio-style voice acting and sound-design technique catalog through `kva benchmarks`
+- License-safe source-library schema through `kva source-library`
+- Creature sound-design recipes through `kva creature-design`
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
 - Long recording segmentation through `kva split-recording`
 - Korean recording script generation, transcript review TSVs, and deterministic dataset splits
@@ -97,6 +102,13 @@ Show benchmark lessons adopted from professional voice tools:
 
 ```powershell
 python -m kva_engine benchmarks --compact
+```
+
+Inspect the source-library policy and a creature sound-design recipe:
+
+```powershell
+python -m kva_engine source-library --compact
+python -m kva_engine creature-design --role dinosaur_giant_roar --compact
 ```
 
 Review the generated audio:
@@ -185,6 +197,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
 - [Professional Voice Product Benchmark Plan](docs/PRO_VOICE_BENCHMARK_PLAN.md)
 - [Professional Voice Benchmark Implementation](docs/PRO_VOICE_BENCHMARK_IMPLEMENTATION.md)
+- [Creator Sound Design Engine](docs/CREATOR_SOUND_DESIGN_ENGINE.md)
 - [Public Korean AI Voice Catalog](docs/PUBLIC_VOICE_CATALOG.md)
 - [Release Quality Gates](docs/RELEASE_QUALITY_GATES.md)
 - [Native Training Direction](docs/KVA_NATIVE_TRAINING.md)

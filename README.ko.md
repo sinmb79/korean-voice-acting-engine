@@ -2,76 +2,69 @@
 
 [English README](README.md)
 
-메타 설명: 한국어를 먼저 이해하고, 한 사람의 목소리를 여러 배역으로 확장하는 로컬 우선 성우 TTS 엔진.
+KVAE는 한국어에 특화된 로컬 우선 성우 엔진입니다. 사용자가 직접 녹음한 한국어 목소리나 한국어 텍스트를 바탕으로 내레이터, 선생님, 악역, 어린이, 늑대, 괴물, 공룡 같은 다양한 캐릭터 음성을 만들고 검증하는 것을 목표로 합니다.
 
-레이블/태그: 한국어 TTS, 성우 엔진, 음성 학습, 로컬 AI, 오픈소스, 22B Labs, The 4th Path
+장기 목표는 더 큽니다. 대형 제작사가 성우 연기, 폴리, 동물 녹음, 합성음, 레이어링, 변형, 믹싱, 리뷰로 소리를 만드는 방식을 개인 창작자가 무료로 쓸 수 있는 프로그램으로 바꾸는 것입니다. 단, 영화나 게임의 저작권 음원을 복사하지 않고, 공개 가능하거나 직접 녹음했거나 라이선스가 명확한 소스만 사용합니다.
 
-## 왜 이 프로젝트가 존재하나
+## 왜 필요한가
 
-좋은 TTS는 글자를 소리로 바꾸는 도구에서 끝나지 않습니다. 특히 한국어는 숫자, 영어 약어, 조사, 억양, 문장 끝의 높낮이가 조금만 어긋나도 바로 낯선 외래어처럼 들립니다.
+일반 TTS는 글을 읽어줍니다. KVAE가 하려는 일은 조금 다릅니다.
 
-이 프로젝트는 기존 영어/중국어 중심 TTS 엔진에 한국어를 억지로 붙이는 대신, 한국어를 먼저 읽고 해석한 뒤 목소리와 배역을 연결하는 엔진을 만들기 위해 시작했습니다.
+한국어의 숫자, 날짜, 영어 약어, 조사, 문장 끝, 호흡, 속도, 발음이 자연스럽게 처리되어야 하고, 사용자의 목소리는 개인 고유재산으로 보호되어야 합니다. 또 성우처럼 하나의 목소리에서 여러 배역을 만들려면 단순 피치 변환이 아니라 호흡, 성대 소스, 공명, 조음, 감정, 속도, 음향효과 레이어가 함께 설계되어야 합니다.
 
-목표는 분명합니다. 한 사람이 제공한 음성을 바탕으로, 그 사람의 정체성은 남기되 성우처럼 여러 배역의 말투로 확장하는 것입니다.
+그래서 KVAE는 한국어 정규화, 음성 프로필, 성우 배역 설계, 로컬 학습 준비, 음성 변환, 크리처 사운드 디자인, 검증 리포트를 하나의 엔진으로 묶습니다.
 
-## 현재 들어있는 것
+## 현재 기능
 
-- 한국어 숫자, 영어, 약어, 기호 읽기 정규화
-- 날짜, 시간, 전화번호, 조사 결합 보조 규칙
+- 한국어 숫자, 영어, 기호, 날짜, 시간, 전화번호, 조사 정규화
 - `speech_text`, `phoneme_text`, `normalization_trace` 생성
-- SSML 변환과 생성/검증 manifest 출력
-- 성우 배역 프리셋: 내레이터, 다큐멘터리, 뉴스, 선생님, 노인 이야기꾼, 낮은 악역, 빠른 아이 목소리, AI 어시스턴트, 늑대, 괴물, 공룡, 어린이
-- 로컬 기본 음성 프로필 자동 연결: `configs/default_voice.local.json`
-- 가족 음성 레지스트리 분석기
-- KVA 자체 모델 포맷: `kva.native_voice_model.v1`
-- 보안 환경용 로컬 학습 준비 CLI
-- 녹음 음성 입력 기반 캐릭터 변환 CLI: `kva convert`
-- 한 번의 녹음으로 여러 후보를 만드는 제품형 워크플로: `kva voice-lab`
-- 성도/포먼트 기반 캐릭터 목소리 설계 CLI: `kva vocal-tract`
-- 완전한 비인간 역할에서는 원본 화자의 들리는 정체성을 제거하는 bioacoustic 다이노사우르스 렌더링
-- 오디오 품질, ASR, CER/WER 검증 CLI: `kva review-audio`
-- 긴 녹음을 학습 검토용 조각으로 나누는 CLI: `kva split-recording`
-- 한국어 녹음 대본 생성, 전사문 TSV 검토, deterministic dataset split
-- 공개 한국어 AI 음성 카탈로그: 출처, 라이선스, 표기문, AI 음성 고지 포함
-- 전문 성우/음성 프로그램 벤치마킹 리포트: `kva benchmarks`
-- 테스트 코드와 개발구현서
+- SSML과 생성 manifest 출력
+- 내레이션, 다큐멘터리, 뉴스, 선생님, 노인 이야기꾼, 악역, AI 비서, 어린이, 늑대, 괴물, 공룡 배역 프리셋
+- `configs/default_voice.local.json` 기반 로컬 기본 목소리 연결
+- VoxCPM 기반 로컬 한국어 음성 렌더 경로
+- `kva convert` 기반 녹음 음성 변환
+- `kva voice-lab` 기반 여러 배역 후보 생성
+- `kva vocal-tract` 기반 성도/공명/source-filter 음성 설계
+- 인간 말소리 정체성을 제거하는 bioacoustic 공룡 렌더링
+- `kva benchmarks` 기반 전문 성우 프로그램과 대형 제작사식 음향 제작법 벤치마크
+- `kva source-library` 기반 라이선스 안전 소스 라이브러리 스키마
+- `kva creature-design` 기반 크리처 사운드 디자인 레시피
+- `kva review-audio` 기반 오디오 품질 검증, 선택적 Whisper ASR, CER/WER
+- `kva split-recording`, `kva recording-plan`, `kva transcript-review`, `kva dataset-split` 기반 학습 데이터 준비
+- 출처, 라이선스, 표기, AI 음성 고지를 포함한 공개 한국어 AI 음성 카탈로그
+- 동의, 프라이버시, 재배포 경계를 남기는 안전 manifest
 
-## 빠르게 실행하기
-
-개발자가 아닌 사람도 목적을 이해할 수 있게 말하면, 첫 명령은 “한국어 문장을 TTS가 읽기 좋은 대본으로 바꾸는 일”입니다.
+## 빠른 시작
 
 ```powershell
+git clone https://github.com/sinmb79/korean-voice-acting-engine.git
 cd korean-voice-acting-engine
 $env:PYTHONPATH = "src"
+python -m unittest discover -s tests
+```
+
+한국어 문장을 음성용 텍스트로 정규화합니다.
+
+```powershell
 python -m kva_engine normalize --file data\sample_input.txt --out outputs\sample.speech.json
 ```
 
-다음 명령은 같은 문장에 성우 배역을 얹습니다.
+배역을 적용합니다.
 
 ```powershell
 python -m kva_engine cast --file data\sample_input.txt --role old_storyteller --out outputs\sample.cast.json
 ```
 
-로컬 기본 목소리가 제대로 연결되었는지는 아래처럼 확인합니다.
+녹음된 연기를 캐릭터 음성으로 변환합니다.
 
 ```powershell
-python -m kva_engine voice-profile
+python -m kva_engine convert `
+  --input my_voice.wav `
+  --role monster_deep_clear `
+  --out outputs\monster.wav
 ```
 
-공개 한국어 AI 음성 후보는 아래처럼 확인합니다.
-
-```powershell
-python -m kva_engine public-voices
-python -m kva_engine voice-profile public:mms-tts-kor
-```
-
-로컬 실행 환경과 안전 설정은 아래처럼 점검합니다.
-
-```powershell
-python -m kva_engine doctor --voice-profile public:mms-tts-kor
-```
-
-녹음 파일 하나로 여러 성우/캐릭터 후보를 한 번에 만들 수 있습니다.
+한 번의 녹음에서 여러 후보를 만듭니다.
 
 ```powershell
 python -m kva_engine voice-lab `
@@ -82,108 +75,83 @@ python -m kva_engine voice-lab `
   --asr-model base
 ```
 
-캐릭터 목소리의 성도/포먼트 설계도도 확인할 수 있습니다.
-
-```powershell
-python -m kva_engine vocal-tract --role dinosaur_giant_roar --compact
-```
-
-전문 성우/음성 프로그램에서 무엇을 반영했는지도 확인할 수 있습니다.
+전문 프로그램과 대형 제작사식 제작법에서 무엇을 반영했는지 확인합니다.
 
 ```powershell
 python -m kva_engine benchmarks --compact
 ```
 
-SSML과 생성 manifest도 바로 만들 수 있습니다.
+공룡, 괴물, 늑대 같은 비인간 사운드 디자인 레시피를 확인합니다.
 
 ```powershell
-python -m kva_engine ssml --file data\sample_input.txt --out outputs\sample.ssml.json
-python -m kva_engine manifest --script outputs\sample.speech.json --role old_storyteller --out outputs\sample.manifest.json
+python -m kva_engine source-library --compact
+python -m kva_engine creature-design --role dinosaur_giant_roar --compact
 ```
 
-## Codex를 통한 음성 학습
+## Codex 학습 워크플로
 
-이 프로젝트의 기본 방향은 보스 PC에서 Codex가 KVAE 명령을 실행해 로컬 학습과 검증을 반복하는 것입니다.
+KVAE는 Codex가 보스의 컴퓨터에서 로컬 명령을 실행하면서 계속 개발하고 정교화하는 방식으로 설계됩니다.
 
-```powershell
-python -m kva_engine train-native `
-  --registry C:\Users\you\workspace\shared-voices `
-  --profile-id my-voice-profile `
-  --out outputs\family_voice_training\kva_native_voice_model.json
-```
+1. 개인 한국어 음성을 로컬에 녹음합니다.
+2. 개인 음성 프로필은 공개 repo 밖에 보관합니다.
+3. Codex가 KVAE 학습, 변환, 렌더, 검증 명령을 실행합니다.
+4. 생성된 WAV와 JSON 리포트를 직접 듣고 확인합니다.
+5. 한국어 정규화, 배역 프리셋, 소스 레이어, 학습 데이터를 개선합니다.
+6. GitHub에는 코드, 공개 예제, 문서만 올립니다.
 
-현재 보안 환경처럼 `torch`, `torchaudio`, `numpy`가 없는 곳에서는 파형을 직접 생성하는 신경망 학습까지는 가지 않습니다. 대신 KVA가 사용할 음성 정체성 seed, acoustic profile, role control layer를 만듭니다.
+개인 녹음, 데이터셋, LoRA 체크포인트, 생성 WAV는 git에서 제외합니다.
 
-집 컴퓨터나 GPU 환경에서는 이 모델 파일을 출발점으로 삼아 Korean acoustic model, duration predictor, pitch/energy predictor, neural vocoder를 이어 붙이면 됩니다.
+## 문서
 
-녹음 원본은 먼저 점검합니다.
+- [Codex Training Workflow](docs/CODEX_TRAINING_WORKFLOW.md)
+- [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)
+- [Dataset Preparation Workflow](docs/DATASET_PREP_WORKFLOW.md)
+- [KVAE Render Engine](docs/KVAE_RENDER_ENGINE.md)
+- [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
+- [Vocal Tract Voice Design](docs/VOCAL_TRACT_ENGINE.md)
+- [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)
+- [Recording Segmentation Workflow](docs/RECORDING_SEGMENTATION.md)
+- [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
+- [Professional Voice Benchmark Implementation](docs/PRO_VOICE_BENCHMARK_IMPLEMENTATION.md)
+- [Creator Sound Design Engine](docs/CREATOR_SOUND_DESIGN_ENGINE.md)
+- [Public Korean AI Voice Catalog](docs/PUBLIC_VOICE_CATALOG.md)
+- [Release Quality Gates](docs/RELEASE_QUALITY_GATES.md)
+- [Native Training Direction](docs/KVA_NATIVE_TRAINING.md)
+- [Family Voice Training](docs/FAMILY_VOICE_TRAINING.md)
+- [Safety Policy](docs/SAFETY_POLICY.md)
+- [Secure Development](docs/SECURE_DEVELOPMENT.md)
 
-```powershell
-python -m kva_engine recording-check `
-  --audio C:\Users\you\workspace\shared-voices\my-voice\references\voice_ko_reference.wav `
-  --out outputs\recording-check.json
-```
+## 공개 배포와 개인 음성 보호
 
-긴 녹음은 학습 전에 조각으로 나눠 검토합니다.
+KVAE repo는 공개 엔진 저장소이지 개인 음성 데이터셋 저장소가 아닙니다.
 
-```powershell
-python -m kva_engine split-recording `
-  --audio C:\Users\you\workspace\shared-voices\my-voice\sessions\session.wav `
-  --transcript-file C:\Users\you\workspace\shared-voices\my-voice\sessions\session.txt `
-  --out-dir outputs\segments
-```
+공개 repo에 들어가야 하는 것:
 
-한국어 녹음 세션 대본과 고정 데이터셋 split도 만들 수 있습니다.
+- 소스 코드
+- 공개 예제
+- 문서
+- 테스트
 
-```powershell
-python -m kva_engine recording-plan --out-dir outputs\recording-plan --target-minutes 30
-python -m kva_engine transcript-review --manifest outputs\segments\segments_manifest.json --out outputs\segments\transcript_review.tsv
-python -m kva_engine dataset-split --manifest outputs\segments\segments_manifest.json --out outputs\dataset_split.json
-```
+공개 repo에 들어가면 안 되는 것:
 
-## 공개 배포와 가족 음성 보호
+- 개인 음성 녹음
+- 개인 음성 데이터셋
+- LoRA 체크포인트
+- 학습된 개인 모델 가중치
+- 개인 화자를 식별할 수 있는 생성 음성
+- `configs/*.local.json` 같은 로컬 설정
 
-이 저장소는 코드와 문서를 공개하기 위한 저장소입니다. 가족 음성 원본, private dataset, checkpoint, LoRA weight, generated output은 `.gitignore`로 제외되어 있습니다.
-
-목소리는 단순한 샘플이 아니라 사람의 흔적입니다. 공개할 수 있는 것은 엔진이고, 보호해야 하는 것은 사람입니다.
-
-`configs/*.local.json`도 공개 추적에서 제외됩니다. 개인 기본 목소리는 로컬 설정에서 private 음성 폴더를 가리키며, 실제 오디오 파일은 저장소에 복사하지 않습니다.
+목소리는 단순 샘플이 아니라 사람의 정체성입니다. KVAE는 엔진은 공개하고, 사람은 보호하는 방향으로 개발합니다.
 
 ## 검증
-
-개발 환경에서 아래 명령으로 테스트합니다.
 
 ```powershell
 $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 python -m compileall -q src
+python -m kva_engine doctor --voice-profile public:mms-tts-kor
 ```
 
-## 문서
+## 라이선스
 
-- `docs/CODEX_TRAINING_WORKFLOW.md`: Codex 기반 로컬 학습 워크플로
-- `docs/DEVELOPMENT_ROADMAP.md`: 남은 개발 과정과 완료 기준
-- `docs/DATASET_PREP_WORKFLOW.ko.md`: 녹음 대본부터 데이터셋 split까지의 준비 절차
-- `docs/DEVELOPMENT_IMPLEMENTATION_SPEC.md`: 전체 개발구현서
-- `docs/RESEARCH_REVIEW.md`: 공개 프로그램, 논문, 국내외 사례 검토
-- `docs/KVA_NATIVE_TRAINING.md`: KVA 네이티브 학습 방향
-- `docs/FAMILY_VOICE_TRAINING.md`: 가족 음성 레지스트리 기반 학습 기록
-- `docs/KVAE_RENDER_ENGINE.md`: 로컬 VoxCPM 렌더 경로
-- `docs/KVAE_CONVERT_ENGINE.md`: 녹음 음성 입력 기반 캐릭터 변환 경로
-- `docs/VOCAL_TRACT_ENGINE.ko.md`: 성도/포먼트 기반 목소리 설계 엔진
-- `docs/VOICE_LAB_WORKFLOW.md`: 한 번의 녹음에서 여러 목소리 후보 생성
-- `docs/RECORDING_SEGMENTATION.ko.md`: 긴 녹음 세그먼트 분할 워크플로
-- `docs/KVAE_REVIEW_ENGINE.md`: 오디오 품질, ASR, WER/CER 검증 경로
-- `docs/PUBLIC_VOICE_CATALOG.md`: 공개 한국어 AI 음성 카탈로그
-- `docs/PRO_VOICE_BENCHMARK_IMPLEMENTATION.ko.md`: 전문 성우 프로그램 벤치마킹 반영
-- `docs/RELEASE_QUALITY_GATES.md`: 릴리스 품질 게이트
-- `docs/SAFETY_POLICY.md`: 음성/동의/공개 정책
-- `docs/SECURE_DEVELOPMENT.md`: 보안 환경 개발 원칙
-
-## 제작자의 철학
-
-한국어를 먼저 존중해야 한국어 목소리가 살아납니다.
-
-이 프로젝트는 빠른 흉내보다 느린 이해를 택합니다. 사람의 목소리를 빌리는 기술은, 사람을 지우지 않을 때 비로소 쓸 만해집니다.
-
-작성자: **22B Labs · 제4의 길 (The 4th Path)**
+Apache-2.0

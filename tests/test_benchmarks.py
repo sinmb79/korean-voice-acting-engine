@@ -18,7 +18,17 @@ class ProfessionalBenchmarkTests(unittest.TestCase):
         self.assertIn("actor-capable", report["summary"]["principle"])
         self.assertGreaterEqual(report["summary"]["product_count"], 6)
         self.assertGreaterEqual(report["summary"]["bioacoustic_reference_count"], 2)
+        self.assertGreaterEqual(report["summary"]["voice_acting_reference_count"], 4)
+        self.assertGreaterEqual(report["summary"]["voice_acting_technique_count"], 8)
+        self.assertGreaterEqual(report["summary"]["studio_sound_design_reference_count"], 6)
+        self.assertGreaterEqual(report["summary"]["studio_sound_design_technique_count"], 7)
         self.assertTrue(any(product["id"] == "vocaltractlab" for product in report["products"]))
+        self.assertTrue(
+            any(reference["id"] == "jurassic_world_bird_calls" for reference in report["studio_sound_design_references"])
+        )
+        self.assertIn("creator_sound_design_mission", report)
+        self.assertIn("voice_acting_techniques", report)
+        self.assertIn("studio_sound_design_techniques", report)
         self.assertIn("bioacoustic_references", report)
         self.assertIn("identity anchoring", " ".join(report["actor_theory"]["program_model"]))
 
@@ -26,9 +36,14 @@ class ProfessionalBenchmarkTests(unittest.TestCase):
         alignment = build_voice_conversion_benchmark_alignment()
 
         self.assertIn("source_filter_anatomy_controls", alignment["adopted"])
+        self.assertIn("voice_acting_technique_catalog", alignment["adopted"])
         self.assertIn("nonhuman_bioacoustic_conversion_without_audible_source_identity", alignment["adopted"])
+        self.assertIn("studio_sound_design_technique_catalog", alignment["adopted"])
+        self.assertIn("source_library_schema_cli", alignment["adopted"])
+        self.assertIn("creature_design_recipe_cli", alignment["adopted"])
         self.assertIn("OpenVoice", alignment["inspired_by"])
         self.assertIn("neural speech-to-speech backend", alignment["remaining"])
+        self.assertIn("creature sound-design render CLI", alignment["remaining"])
 
     def test_benchmarks_cli_outputs_report(self):
         stdout = io.StringIO()

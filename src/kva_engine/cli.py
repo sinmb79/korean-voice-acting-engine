@@ -21,6 +21,7 @@ from kva_engine.public_voices import (
 )
 from kva_engine.review.audio_review import recording_check, review_audio
 from kva_engine.review.manifest import build_generation_manifest
+from kva_engine.sound_design import build_creature_design_recipe, build_source_library_report
 from kva_engine.ssml import speech_script_to_ssml
 from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert_voice_file
 from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesis_plan, render_voxcpm_speech
@@ -101,6 +102,23 @@ def main(argv: list[str] | None = None) -> int:
     )
     benchmarks_parser.add_argument("--out", help="Output JSON path")
     benchmarks_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    source_library_parser = subparsers.add_parser(
+        "source-library",
+        help="Show the license-safe source library schema for creature and Foley sound design",
+    )
+    source_library_parser.add_argument("--out", help="Output JSON path")
+    source_library_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    creature_design_parser = subparsers.add_parser(
+        "creature-design",
+        help="Create a studio-style creature sound design recipe for a KVAE role",
+    )
+    creature_design_parser.add_argument("--role", required=True, choices=sorted(PRESETS))
+    creature_design_parser.add_argument("--intent", default="cinematic")
+    creature_design_parser.add_argument("--intensity", type=float, default=1.0)
+    creature_design_parser.add_argument("--out", help="Output JSON path")
+    creature_design_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     vocal_tract_parser = subparsers.add_parser(
         "vocal-tract",
@@ -338,6 +356,14 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.command == "benchmarks":
         return _emit(build_professional_benchmark_report(), out=args.out, compact=args.compact)
+    if args.command == "source-library":
+        return _emit(build_source_library_report(), out=args.out, compact=args.compact)
+    if args.command == "creature-design":
+        return _emit(
+            build_creature_design_recipe(args.role, intent=args.intent, intensity=args.intensity),
+            out=args.out,
+            compact=args.compact,
+        )
     if args.command == "vocal-tract":
         design = build_vocal_tract_design(
             args.role,
