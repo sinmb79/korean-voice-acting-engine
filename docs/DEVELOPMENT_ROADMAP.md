@@ -15,6 +15,7 @@ Done:
 - license-safe public voice install plans through `kva public-voices --install-plan`
 - deterministic recorded-voice conversion through `kva convert`
 - multi-role candidate generation through `kva voice-lab`
+- source-filter vocal tract voice design through `kva vocal-tract`
 - named Voice Lab role groups: `default`, `dialogue`, `creature`, `narration`, `shorts`
 - audio review through `kva review-audio`
 - raw recording check through `kva recording-check`
@@ -69,10 +70,12 @@ Goal:
 - preserve a user's acting timing, pauses, and emotion
 - change voice identity into selected character voices
 - outperform deterministic pitch/EQ conversion
+- reuse the vocal-tract design contract for controllable source/filter and neural rendering
 
 Needed:
 
 - backend interface for RVC/FreeVC/so-vits-svc/KVAE-STS
+- WORLD/pyworld analysis-synthesis adapter for F0, spectral envelope, and aperiodicity
 - local model registry
 - training/evaluation split
 - objective review plus human listening review

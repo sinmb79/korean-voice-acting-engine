@@ -27,6 +27,7 @@
 - 보안 환경용 로컬 학습 준비 CLI
 - 녹음 음성 입력 기반 캐릭터 변환 CLI: `kva convert`
 - 한 번의 녹음으로 여러 후보를 만드는 제품형 워크플로: `kva voice-lab`
+- 성도/포먼트 기반 캐릭터 목소리 설계 CLI: `kva vocal-tract`
 - 오디오 품질, ASR, CER/WER 검증 CLI: `kva review-audio`
 - 긴 녹음을 학습 검토용 조각으로 나누는 CLI: `kva split-recording`
 - 한국어 녹음 대본 생성, 전사문 TSV 검토, deterministic dataset split
@@ -77,6 +78,12 @@ python -m kva_engine voice-lab `
   --group default `
   --expected-file script.txt `
   --asr-model base
+```
+
+캐릭터 목소리의 성도/포먼트 설계도도 확인할 수 있습니다.
+
+```powershell
+python -m kva_engine vocal-tract --role dinosaur_giant_roar --compact
 ```
 
 SSML과 생성 manifest도 바로 만들 수 있습니다.
@@ -155,6 +162,7 @@ python -m compileall -q src
 - `docs/FAMILY_VOICE_TRAINING.md`: 가족 음성 레지스트리 기반 학습 기록
 - `docs/KVAE_RENDER_ENGINE.md`: 로컬 VoxCPM 렌더 경로
 - `docs/KVAE_CONVERT_ENGINE.md`: 녹음 음성 입력 기반 캐릭터 변환 경로
+- `docs/VOCAL_TRACT_ENGINE.ko.md`: 성도/포먼트 기반 목소리 설계 엔진
 - `docs/VOICE_LAB_WORKFLOW.md`: 한 번의 녹음에서 여러 목소리 후보 생성
 - `docs/RECORDING_SEGMENTATION.ko.md`: 긴 녹음 세그먼트 분할 워크플로
 - `docs/KVAE_REVIEW_ENGINE.md`: 오디오 품질, ASR, WER/CER 검증 경로

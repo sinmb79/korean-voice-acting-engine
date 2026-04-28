@@ -15,6 +15,7 @@
 - `kva public-voices --install-plan` 기반 라이선스 안전 공개 음성 설치 계획
 - `kva convert` 기반 녹음 음성 변환
 - `kva voice-lab` 기반 다중 캐릭터 후보 생성
+- `kva vocal-tract` 기반 source-filter 성도 목소리 설계
 - `default`, `dialogue`, `creature`, `narration`, `shorts` Voice Lab role group
 - `kva review-audio` 기반 오디오 리뷰
 - `kva recording-check` 기반 원본 녹음 점검
@@ -69,10 +70,12 @@
 - 사용자의 연기 타이밍, 쉼, 감정 보존
 - 목소리 정체성만 선택한 캐릭터로 변환
 - 단순 pitch/EQ 변환보다 자연스러운 결과
+- vocal-tract design 계약을 source/filter 제어와 neural rendering에 재사용
 
 필요:
 
 - RVC/FreeVC/so-vits-svc/KVAE-STS backend interface
+- F0, spectral envelope, aperiodicity를 다루는 WORLD/pyworld analysis-synthesis adapter
 - 로컬 모델 registry
 - train/evaluation split
 - 객관 리뷰와 사람 청취 리뷰 병행

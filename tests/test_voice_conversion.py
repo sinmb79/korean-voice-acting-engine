@@ -23,6 +23,7 @@ class VoiceConversionTests(unittest.TestCase):
         self.assertEqual(plan.engine, "kva-convert-ffmpeg-v1")
         self.assertEqual(plan.role, "wolf_growl")
         self.assertTrue(plan.to_dict()["role_controls"]["pitch_shift"] < 0)
+        self.assertLess(plan.to_dict()["vocal_tract_design"]["filter"]["formant_shift_ratio"], 1.0)
         self.assertEqual(plan.warnings, [])
 
     def test_convert_dry_run_cli_outputs_plan(self):

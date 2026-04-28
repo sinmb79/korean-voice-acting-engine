@@ -24,6 +24,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Local render path for VoxCPM-based Korean voice generation
 - Recorded voice conversion through `kva convert`
 - Multi-role voice candidate workflow through `kva voice-lab`
+- Source-filter vocal tract voice designs through `kva vocal-tract`
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
 - Long recording segmentation through `kva split-recording`
 - Korean recording script generation, transcript review TSVs, and deterministic dataset splits
@@ -82,6 +83,12 @@ python -m kva_engine voice-lab `
   --group default `
   --expected-file script.txt `
   --asr-model base
+```
+
+Inspect the anatomical source-filter design for a character voice:
+
+```powershell
+python -m kva_engine vocal-tract --role dinosaur_giant_roar --compact
 ```
 
 Review the generated audio:
@@ -164,6 +171,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [Dataset Preparation Workflow](docs/DATASET_PREP_WORKFLOW.md)
 - [KVAE Render Engine](docs/KVAE_RENDER_ENGINE.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
+- [Vocal Tract Voice Design](docs/VOCAL_TRACT_ENGINE.md)
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)
 - [Recording Segmentation Workflow](docs/RECORDING_SEGMENTATION.md)
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)

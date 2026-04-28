@@ -5,6 +5,8 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from kva_engine.acting.vocal_tract import build_vocal_tract_design, build_vocal_tract_filter_chain
+
 
 def normalize_wav_with_ffmpeg(
     input_path: str | Path,
@@ -71,6 +73,8 @@ def apply_role_audio_transform(
     pitch_shift = float(role_controls.get("pitch_shift", 0.0) or 0.0)
     speed = float(role_controls.get("speed", 1.0) or 1.0)
     filters = _role_filter_chain(pitch_shift=pitch_shift, speed=speed, sample_rate=sample_rate)
+    vocal_tract_filters = build_vocal_tract_filter_chain(str(role_controls.get("role", "")))
+    filters.extend(vocal_tract_filters)
     character_filters = _character_filter_chain(str(role_controls.get("role", "")))
     filters.extend(character_filters)
     if not filters:
@@ -106,6 +110,8 @@ def apply_role_audio_transform(
         "output": str(output_wav),
         "pitch_shift": pitch_shift,
         "speed": speed,
+        "vocal_tract_effects": vocal_tract_filters,
+        "vocal_tract_design": _vocal_tract_design_dict(str(role_controls.get("role", ""))),
         "character_effects": character_filters,
     }
 
@@ -228,3 +234,10 @@ def _character_filter_chain(role: str) -> list[str]:
             "equalizer=f=5200:t=q:w=1.2:g=1.5",
         ]
     return []
+
+
+def _vocal_tract_design_dict(role: str) -> dict[str, Any] | None:
+    try:
+        return build_vocal_tract_design(role).to_dict()
+    except ValueError:
+        return None

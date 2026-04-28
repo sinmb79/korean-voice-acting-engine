@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from kva_engine.acting.presets import get_preset
+from kva_engine.acting.vocal_tract import build_vocal_tract_design
 from kva_engine.synthesis.audio_postprocess import apply_role_audio_transform, normalize_wav_with_ffmpeg
 from kva_engine.training.audio_features import analyze_wav
 from kva_engine.voice_profile import load_voice_profile
@@ -30,6 +31,7 @@ class VoiceConversionPlan:
             "output_path": str(self.output_path),
             "role": self.role,
             "role_controls": _role_controls(self.role),
+            "vocal_tract_design": _vocal_tract_design(self.role),
             "voice_profile": self.voice_profile,
             "normalize": self.normalize,
             "manifest_path": str(self.manifest_path) if self.manifest_path else None,
@@ -113,6 +115,7 @@ def convert_voice_file(plan: VoiceConversionPlan) -> dict[str, Any]:
             "input_path": str(plan.input_path),
             "output_path": str(plan.output_path),
             "role_controls": role_controls,
+            "vocal_tract_design": _vocal_tract_design(plan.role),
             "role_postprocess": role_postprocess,
             "postprocess": normalize_postprocess,
             "warnings": plan.warnings,
@@ -153,6 +156,13 @@ def _role_controls(role: str) -> dict[str, Any]:
         return get_preset(role).to_dict()
     except ValueError:
         return {}
+
+
+def _vocal_tract_design(role: str) -> dict[str, Any] | None:
+    try:
+        return build_vocal_tract_design(role).to_dict()
+    except ValueError:
+        return None
 
 
 def _source_audio_info(path: Path) -> dict[str, Any]:

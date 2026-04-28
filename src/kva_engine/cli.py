@@ -7,6 +7,7 @@ from pathlib import Path
 
 from kva_engine.acting.planner import plan_voice_acting
 from kva_engine.acting.presets import PRESETS
+from kva_engine.acting.vocal_tract import build_vocal_tract_design
 from kva_engine.diagnostics import run_doctor
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
@@ -92,6 +93,16 @@ def main(argv: list[str] | None = None) -> int:
     )
     public_voices_parser.add_argument("--out", help="Output JSON path")
     public_voices_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    vocal_tract_parser = subparsers.add_parser(
+        "vocal-tract",
+        help="Create a source-filter vocal tract voice design for a KVAE role",
+    )
+    vocal_tract_parser.add_argument("--role", required=True, choices=sorted(PRESETS))
+    vocal_tract_parser.add_argument("--identity-strength", type=float, help="Override source speaker anchor strength")
+    vocal_tract_parser.add_argument("--intensity", type=float, default=1.0, help="Character anatomy intensity, 0.0 to 1.5")
+    vocal_tract_parser.add_argument("--out", help="Output JSON path")
+    vocal_tract_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     ssml_parser = subparsers.add_parser("ssml", help="Create SSML from Korean-normalized text")
     ssml_parser.add_argument("text", nargs="?", help="Display text to normalize")
@@ -317,6 +328,13 @@ def main(argv: list[str] | None = None) -> int:
             out=args.out,
             compact=args.compact,
         )
+    if args.command == "vocal-tract":
+        design = build_vocal_tract_design(
+            args.role,
+            identity_strength=args.identity_strength,
+            intensity=args.intensity,
+        )
+        return _emit(design.to_dict(), out=args.out, compact=args.compact)
     if args.command == "ssml":
         script = _build_script(args)
         return _emit(
