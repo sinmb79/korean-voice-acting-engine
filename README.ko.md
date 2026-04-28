@@ -28,6 +28,7 @@
 - 녹음 음성 입력 기반 캐릭터 변환 CLI: `kva convert`
 - 한 번의 녹음으로 여러 후보를 만드는 제품형 워크플로: `kva voice-lab`
 - 오디오 품질, ASR, CER/WER 검증 CLI: `kva review-audio`
+- 긴 녹음을 학습 검토용 조각으로 나누는 CLI: `kva split-recording`
 - 공개 한국어 AI 음성 카탈로그: 출처, 라이선스, 표기문, AI 음성 고지 포함
 - 테스트 코드와 개발구현서
 
@@ -107,6 +108,15 @@ python -m kva_engine recording-check `
   --out outputs\recording-check.json
 ```
 
+긴 녹음은 학습 전에 조각으로 나눠 검토합니다.
+
+```powershell
+python -m kva_engine split-recording `
+  --audio C:\Users\you\workspace\shared-voices\my-voice\sessions\session.wav `
+  --transcript-file C:\Users\you\workspace\shared-voices\my-voice\sessions\session.txt `
+  --out-dir outputs\segments
+```
+
 ## 공개 배포와 가족 음성 보호
 
 이 저장소는 코드와 문서를 공개하기 위한 저장소입니다. 가족 음성 원본, private dataset, checkpoint, LoRA weight, generated output은 `.gitignore`로 제외되어 있습니다.
@@ -136,6 +146,7 @@ python -m compileall -q src
 - `docs/KVAE_RENDER_ENGINE.md`: 로컬 VoxCPM 렌더 경로
 - `docs/KVAE_CONVERT_ENGINE.md`: 녹음 음성 입력 기반 캐릭터 변환 경로
 - `docs/VOICE_LAB_WORKFLOW.md`: 한 번의 녹음에서 여러 목소리 후보 생성
+- `docs/RECORDING_SEGMENTATION.ko.md`: 긴 녹음 세그먼트 분할 워크플로
 - `docs/KVAE_REVIEW_ENGINE.md`: 오디오 품질, ASR, WER/CER 검증 경로
 - `docs/PUBLIC_VOICE_CATALOG.md`: 공개 한국어 AI 음성 카탈로그
 - `docs/RELEASE_QUALITY_GATES.md`: 릴리스 품질 게이트

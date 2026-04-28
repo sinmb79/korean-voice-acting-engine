@@ -2,14 +2,14 @@
 
 [English document](DEVELOPMENT_ROADMAP.md)
 
-이 문서는 KVAE가 어디까지 됐고, 아직 무엇이 남았는지 솔직하게 보고하기 위해 둡니다.
+이 문서는 KVAE가 어디까지 왔고, 아직 무엇이 남았는지 솔직하게 보고하기 위한 로드맵입니다.
 
 ## 현재 완료 상태
 
 완료:
 
 - 숫자, 영어, 기호, 날짜, 시간, 전화번호, 조사, 발음 trace를 포함한 한국어 정규화
-- SSML 및 manifest 생성
+- SSML과 생성 manifest 출력
 - private local voice와 public AI voice profile 해석
 - 출처, 라이선스, 표기문, AI 음성 고지를 포함한 공개 한국어 AI 음성 카탈로그
 - `kva public-voices --install-plan` 기반 라이선스 안전 공개 음성 설치 계획
@@ -18,7 +18,8 @@
 - `default`, `dialogue`, `creature`, `narration`, `shorts` Voice Lab role group
 - `kva review-audio` 기반 오디오 리뷰
 - `kva recording-check` 기반 원본 녹음 점검
-- `kva doctor` 기반 런타임/안전 설정 점검
+- `kva split-recording` 기반 긴 녹음 세그먼트 분할
+- `kva doctor` 기반 런타임과 안전 설정 점검
 - 릴리스 품질 게이트와 GitHub Actions CI
 
 짧게 말하면, KVAE는 현재 로컬 CLI 엔진, 안전 메타데이터, 리뷰 리포트, CI까지 갖춘 상태입니다.
@@ -27,7 +28,7 @@
 
 ### Phase 1. Voice Lab 제품형 워크플로
 
-상태: 진행 중, v1 사용 가능.
+상태: 진행 중. v1 사용 가능.
 
 목표:
 
@@ -39,16 +40,16 @@
 
 - 역할별 명료도 기준
 - 후보 비교 리포트
-- 사람 청취 리뷰용 listening score 필드
+- 사람 청취 리뷰와 listening score 필드
 
-### Phase 2. 공개 음성 설치 및 렌더 어댑터
+### Phase 2. 공개 음성 설치와 렌더 어댑터
 
-상태: 메타데이터 카탈로그와 설치 계획 구현 완료, 실제 렌더 어댑터는 남음.
+상태: 메타데이터 카탈로그와 설치 계획은 구현 완료. 실제 렌더 어댑터는 남음.
 
 목표:
 
 - 사용자가 승인한 공개 한국어 AI 음성을 명시적으로 설치
-- 외부 모델 다운로드 전 라이선스 확인 요구
+- 외부 모델 다운로드 전에 라이선스 확인 요구
 - 모든 manifest에 출처, 라이선스, 표기문, AI 음성 고지 포함
 
 필요:
@@ -56,9 +57,9 @@
 - MMS, Piper, Coqui 등 provider adapter
 - 사용자가 선택한 로컬 폴더 아래 offline cache 구조
 
-### Phase 3. Neural Speech-to-Speech 백엔드
+### Phase 3. Neural Speech-To-Speech 백엔드
 
-상태: CLI 계약은 준비, neural backend는 미완성.
+상태: CLI 계약은 준비. neural backend는 미완성.
 
 목표:
 
@@ -75,18 +76,17 @@
 
 ### Phase 4. 한국어 연기 데이터셋 확장
 
-상태: recording-check와 benchmark plan 존재, 대형 데이터셋은 남음.
+상태: recording-check, benchmark plan, v1 세그먼트 분할은 구현. 검토된 대규모 데이터셋은 아직 필요.
 
 목표:
 
 - 화자별 30-120분의 깨끗한 한국어 녹음
 - 역할별 연기 데이터 포함
-- 숫자, 날짜, 영어 약어, 문장 끝, 조사, 어려운 발음 커버
+- 숫자, 날짜, 영어 읽기, 문장 끝 조사, 어려운 발음 커버
 
 필요:
 
 - 녹음 세션 생성기
-- silence/segment splitter
 - 전사문 교정 워크플로
 - train/validation/test 분리
 
@@ -97,10 +97,10 @@
 목표:
 
 - 비개발자도 사용 가능
-- WAV를 끌어넣고
+- WAV를 끌어 넣고
 - 역할을 선택하고
 - 들어보고 비교하고 export
-- 출처/라이선스/AI 음성 고지 명확히 표시
+- 출처, 라이선스, AI 음성 고지를 명확히 표시
 
 필요:
 
@@ -109,13 +109,13 @@
 - role preset editor
 - review dashboard
 
-### Phase 6. 릴리스 패키징
+### Phase 6. 릴리스 패키지
 
-상태: wheel build smoke 통과, 정식 릴리스 자동화는 남음.
+상태: wheel build smoke 통과. 정식 릴리스 자동화는 남음.
 
 목표:
 
-- 깨끗하게 설치
+- 깔끔하게 설치
 - `kva doctor` 실행
 - CI 통과
 - 영어 기본 문서와 선택 한국어 문서 제공
@@ -129,7 +129,7 @@
 
 ## 완료의 정의
 
-KVAE는 사용자가 다음을 할 수 있어야 “완료”에 가까워집니다.
+KVAE는 사용자가 다음을 할 수 있을 때 “완료”에 가까워집니다.
 
 1. 설치한다.
 2. `kva doctor`를 실행한다.
@@ -137,6 +137,6 @@ KVAE는 사용자가 다음을 할 수 있어야 “완료”에 가까워집니
 4. 한국어 텍스트 또는 녹음 연기를 입력한다.
 5. 여러 목소리 후보를 생성한다.
 6. review report를 확인한다.
-7. 출처/라이선스/AI 음성 고지를 확인한다.
+7. 출처, 라이선스, AI 음성 고지를 확인한다.
 8. private 음성 데이터를 public repo 밖에 둔다.
-9. 자기 취향에 맞게 역할과 품질 기준을 수정한다.
+9. 자기 취향에 맞게 역할과 검증 기준을 수정한다.

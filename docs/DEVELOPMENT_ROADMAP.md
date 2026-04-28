@@ -1,6 +1,6 @@
 # Development Roadmap
 
-[한국어 문서](DEVELOPMENT_ROADMAP.ko.md)
+[Korean document](DEVELOPMENT_ROADMAP.ko.md)
 
 This roadmap exists so KVAE reports what is done and what is still missing honestly.
 
@@ -18,6 +18,7 @@ Done:
 - named Voice Lab role groups: `default`, `dialogue`, `creature`, `narration`, `shorts`
 - audio review through `kva review-audio`
 - raw recording check through `kva recording-check`
+- long recording segmentation through `kva split-recording`
 - runtime and safety diagnostics through `kva doctor`
 - release quality gates and GitHub Actions CI
 
@@ -75,7 +76,7 @@ Needed:
 
 ### Phase 4. Korean Acting Dataset Expansion
 
-Status: recording-check and benchmark plan exist; larger dataset still needed.
+Status: recording-check, benchmark plan, and v1 segmentation exist; reviewed larger datasets still needed.
 
 Goal:
 
@@ -86,7 +87,6 @@ Goal:
 Needed:
 
 - recording session generator
-- silence/segment splitter
 - transcript correction workflow
 - train/validation/test split
 

@@ -1,6 +1,6 @@
 # Korean Voice Acting Engine
 
-[한국어 README](README.ko.md)
+[Korean README](README.ko.md)
 
 Korean Voice Acting Engine, or KVAE, is a local-first voice acting toolkit for Korean speech. It is designed to turn Korean text and recorded voice performances into reusable voice acting outputs while keeping private voice data on the user's own machine.
 
@@ -25,6 +25,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Recorded voice conversion through `kva convert`
 - Multi-role voice candidate workflow through `kva voice-lab`
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
+- Long recording segmentation through `kva split-recording`
 - Built-in public Korean AI voice catalog with source, license, attribution, and AI-voice disclosure metadata
 - Local training manifest and KVA-native statistical voice model preparation
 - Safety-oriented manifests for consent, privacy, and redistribution boundaries
@@ -136,6 +137,15 @@ python -m kva_engine recording-check `
   --out outputs\recording-check.json
 ```
 
+Split a long recording into auditable training segments:
+
+```powershell
+python -m kva_engine split-recording `
+  --audio C:\Users\you\workspace\shared-voices\my-voice\sessions\session.wav `
+  --transcript-file C:\Users\you\workspace\shared-voices\my-voice\sessions\session.txt `
+  --out-dir outputs\segments
+```
+
 Private recordings, datasets, LoRA checkpoints, and generated WAV files are intentionally excluded from git.
 
 ## Documentation
@@ -145,6 +155,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [KVAE Render Engine](docs/KVAE_RENDER_ENGINE.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)
+- [Recording Segmentation Workflow](docs/RECORDING_SEGMENTATION.md)
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
 - [Professional Voice Product Benchmark Plan](docs/PRO_VOICE_BENCHMARK_PLAN.md)
 - [Public Korean AI Voice Catalog](docs/PUBLIC_VOICE_CATALOG.md)

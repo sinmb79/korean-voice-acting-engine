@@ -24,6 +24,7 @@ from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert
 from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesis_plan, render_voxcpm_speech
 from kva_engine.training.family_registry import build_family_registry_training_manifest
 from kva_engine.training.native_voice_model import train_native_voice_model
+from kva_engine.training.segmentation import split_wav_on_silence
 from kva_engine.voice_profile import load_voice_profile
 from kva_engine.workflows.voice_lab import VOICE_LAB_ROLE_GROUPS, resolve_voice_lab_roles, run_voice_lab_conversion
 
@@ -117,6 +118,24 @@ def main(argv: list[str] | None = None) -> int:
     recording_check_parser.add_argument("--audio", required=True, help="Recording WAV path to check")
     recording_check_parser.add_argument("--out", help="Output JSON path")
     recording_check_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    split_recording_parser = subparsers.add_parser(
+        "split-recording",
+        help="Split a long Korean training recording into silence-based WAV segments",
+    )
+    split_recording_parser.add_argument("--audio", required=True, help="Long-form WAV recording to split")
+    split_recording_parser.add_argument("--out-dir", required=True, help="Output folder for segments and manifest")
+    split_recording_parser.add_argument(
+        "--transcript-file",
+        dest="transcript_path",
+        help="Optional UTF-8 transcript file, one utterance per non-empty line",
+    )
+    split_recording_parser.add_argument("--silence-threshold", type=float, default=0.015)
+    split_recording_parser.add_argument("--min-silence-ms", type=int, default=450)
+    split_recording_parser.add_argument("--min-segment-ms", type=int, default=400)
+    split_recording_parser.add_argument("--padding-ms", type=int, default=80)
+    split_recording_parser.add_argument("--out", help="Optional JSON report path")
+    split_recording_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     render_parser = subparsers.add_parser("render", help="Render Korean speech to WAV through the KVAE engine")
     render_parser.add_argument("text", nargs="?", help="Display text to normalize and render")
@@ -294,6 +313,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "recording-check":
         review = recording_check(audio_path=args.audio)
         return _emit(review, out=args.out, compact=args.compact)
+    if args.command == "split-recording":
+        manifest = split_wav_on_silence(
+            audio_path=args.audio,
+            output_dir=args.out_dir,
+            transcript_path=args.transcript_path,
+            silence_threshold=args.silence_threshold,
+            min_silence_ms=args.min_silence_ms,
+            min_segment_ms=args.min_segment_ms,
+            padding_ms=args.padding_ms,
+        )
+        return _emit(manifest, out=args.out, compact=args.compact)
     if args.command == "render":
         script = _build_script(args)
         plan = build_voxcpm_synthesis_plan(
