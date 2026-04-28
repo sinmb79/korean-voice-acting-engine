@@ -17,6 +17,7 @@
 - `kva voice-lab` 기반 다중 캐릭터 후보 생성
 - `kva vocal-tract` 기반 source-filter 성도 목소리 설계
 - `kva benchmarks` 기반 전문 성우/음성 프로그램 벤치마킹 리포트
+- 원본 화자의 들리는 정체성을 제거하는 비인간 bioacoustic 다이노사우르스 렌더링
 - `default`, `dialogue`, `creature`, `narration`, `shorts` Voice Lab role group
 - `kva review-audio` 기반 오디오 리뷰
 - `kva recording-check` 기반 원본 녹음 점검
@@ -73,6 +74,7 @@
 - 단순 pitch/EQ 변환보다 자연스러운 결과
 - vocal-tract design 계약을 source/filter 제어와 neural rendering에 재사용
 - 성우가 증명하는 인간 음성의 가변성을 프로그램 제어 구조로 모델링
+- 목표가 완전한 비인간 발성일 때는 사람 캐릭터 변환과 bioacoustic rendering을 분리
 
 필요:
 

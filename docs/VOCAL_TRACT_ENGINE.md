@@ -47,16 +47,15 @@ The product goal is actor-capable voice conversion: one recorded human performan
 - `monster_deep_clear`: larger tract, heavier pharyngeal resonance, lower spectral tilt
 - `dinosaur_giant_roar`: extreme tract length, low formants, rough and subharmonic source
 
-## Layered Dinosaur V2
+## Bioacoustic Dinosaur V3
 
-`dinosaur_giant` and `dinosaur_giant_roar` now use a layered v2 chain instead of a single low-pitch filter:
+`dinosaur_giant` and `dinosaur_giant_roar` now use a bioacoustic v3 renderer instead of audible source-speaker voice conversion:
 
-- main transformed performance
-- low chest-resonance layer
-- rough throat/grit layer
-- delayed low-frequency body-rumble layer
+- the source speaker's audible identity is removed
+- the source recording controls duration, energy envelope, and performance dynamics only
+- the output is synthesized from low closed-mouth boom, body rumble, throat grit, and pressure noise
 
-The low layers preserve the original performance duration, so the result should read more like a large creature built from the actor's performance and less like a simply slowed human voice.
+The old layered dinosaur v2 chain remains as a fallback/debug path, but the product path no longer leaves a human speech hint in the audible dinosaur voice.
 
 ## Research Anchors
 

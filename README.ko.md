@@ -28,6 +28,7 @@
 - 녹음 음성 입력 기반 캐릭터 변환 CLI: `kva convert`
 - 한 번의 녹음으로 여러 후보를 만드는 제품형 워크플로: `kva voice-lab`
 - 성도/포먼트 기반 캐릭터 목소리 설계 CLI: `kva vocal-tract`
+- 완전한 비인간 역할에서는 원본 화자의 들리는 정체성을 제거하는 bioacoustic 다이노사우르스 렌더링
 - 오디오 품질, ASR, CER/WER 검증 CLI: `kva review-audio`
 - 긴 녹음을 학습 검토용 조각으로 나누는 CLI: `kva split-recording`
 - 한국어 녹음 대본 생성, 전사문 TSV 검토, deterministic dataset split

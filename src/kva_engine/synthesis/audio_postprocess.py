@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from kva_engine.acting.vocal_tract import build_vocal_tract_design, build_vocal_tract_filter_chain
+from kva_engine.synthesis.bioacoustic import render_bioacoustic_dinosaur
 
 
 def normalize_wav_with_ffmpeg(
@@ -74,7 +75,7 @@ def apply_role_audio_transform(
     pitch_shift = float(role_controls.get("pitch_shift", 0.0) or 0.0)
     speed = float(role_controls.get("speed", 1.0) or 1.0)
     if role in {"dinosaur_giant", "dinosaur_giant_roar"}:
-        return _apply_layered_dinosaur_transform(
+        return _apply_bioacoustic_dinosaur_transform(
             ffmpeg=ffmpeg,
             input_wav=input_wav,
             output_wav=output_wav,
@@ -125,6 +126,99 @@ def apply_role_audio_transform(
         "vocal_tract_effects": vocal_tract_filters,
         "vocal_tract_design": _vocal_tract_design_dict(role),
         "character_effects": character_filters,
+    }
+
+
+def _apply_bioacoustic_dinosaur_transform(
+    *,
+    ffmpeg: str,
+    input_wav: Path,
+    output_wav: Path,
+    role: str,
+    pitch_shift: float,
+    speed: float,
+    sample_rate: int,
+) -> dict[str, Any]:
+    prepared_wav = output_wav.with_name(f"{output_wav.stem}.source.wav")
+    prepare = _prepare_mono_wav_with_ffmpeg(
+        ffmpeg=ffmpeg,
+        input_wav=input_wav,
+        output_wav=prepared_wav,
+        sample_rate=sample_rate,
+    )
+    if not prepare.get("applied"):
+        return prepare
+
+    try:
+        render = render_bioacoustic_dinosaur(prepared_wav, output_wav, role=role)
+    except Exception as exc:  # pragma: no cover - fallback protects conversion jobs in the field.
+        fallback = _apply_layered_dinosaur_transform(
+            ffmpeg=ffmpeg,
+            input_wav=input_wav,
+            output_wav=output_wav,
+            role=role,
+            pitch_shift=pitch_shift,
+            speed=speed,
+            sample_rate=sample_rate,
+        )
+        fallback["fallback_from"] = "kva-bioacoustic-dinosaur-v3"
+        fallback["fallback_error"] = str(exc)
+        return fallback
+    finally:
+        try:
+            if prepared_wav != input_wav and prepared_wav.exists():
+                prepared_wav.unlink()
+        except OSError:
+            pass
+
+    render.update(
+        {
+            "prepare": prepare,
+            "pitch_shift": pitch_shift,
+            "speed": speed,
+            "vocal_tract_design": _vocal_tract_design_dict(role),
+            "nonhuman_contract": {
+                "source_voice_identity_retained": False,
+                "source_speech_audible": False,
+                "source_used_for": ["duration", "energy_envelope", "performance_dynamics"],
+            },
+        }
+    )
+    return render
+
+
+def _prepare_mono_wav_with_ffmpeg(
+    *,
+    ffmpeg: str,
+    input_wav: Path,
+    output_wav: Path,
+    sample_rate: int,
+) -> dict[str, Any]:
+    output_wav.parent.mkdir(parents=True, exist_ok=True)
+    command = [
+        ffmpeg,
+        "-y",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        str(input_wav),
+        "-ar",
+        str(sample_rate),
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        str(output_wav),
+    ]
+    completed = subprocess.run(command, capture_output=True, text=True, check=False)
+    return {
+        "applied": completed.returncode == 0,
+        "engine": "ffmpeg-mono-wav-prepare",
+        "command": command,
+        "returncode": completed.returncode,
+        "stderr": completed.stderr.strip(),
+        "output": str(output_wav),
     }
 
 

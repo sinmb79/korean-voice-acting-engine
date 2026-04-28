@@ -17,6 +17,7 @@ Done:
 - multi-role candidate generation through `kva voice-lab`
 - source-filter vocal tract voice design through `kva vocal-tract`
 - professional voice product benchmark reporting through `kva benchmarks`
+- nonhuman bioacoustic dinosaur rendering that removes audible source-speaker identity
 - named Voice Lab role groups: `default`, `dialogue`, `creature`, `narration`, `shorts`
 - audio review through `kva review-audio`
 - raw recording check through `kva recording-check`
@@ -73,6 +74,7 @@ Goal:
 - outperform deterministic pitch/EQ conversion
 - reuse the vocal-tract design contract for controllable source/filter and neural rendering
 - model the actor-proven variability of one human voice as programmable source, filter, articulation, and performance controls
+- separate human character conversion from fully nonhuman bioacoustic rendering when the target should not retain speech identity
 
 Needed:
 

@@ -60,12 +60,16 @@ KVAE models that as:
 
 ## Dinosaur Voice Fix
 
-The first dinosaur sample sounded like a low-pitched voice, not a large creature. KVAE now uses a layered dinosaur chain:
+The first dinosaur samples sounded like low-pitched human voices, not a large nonhuman animal. KVAE now treats dinosaur roles as bioacoustic synthesis, not voice identity conversion.
 
-- main transformed voice
-- very low chest-resonance layer
-- rough throat/grit layer
-- delayed low-frequency body rumble
-- duration-preserving pitch layers so the actor's timing does not collapse into a slow human voice
+- the source speaker identity is removed from the audible signal
+- the source recording is used only for duration, energy envelope, and performance dynamics
+- the rendered sound uses closed-mouth boom/hoot carriers, sub-bass body rumble, throat grit, and pressure noise
+- the older layered pitch chain remains only as a fallback/debug path
 
-This is still not the final neural backend, but it is a better product-facing v2 effect while the WORLD/neural renderer is being developed.
+This follows the research direction that some dinosaurs may have used low-frequency closed-mouth vocalization rather than mammal-like open-mouth roars.
+
+Research anchors:
+
+- Riede et al., "Coos, Booms, and Hoots": https://academic.oup.com/evolut/article-abstract/70/8/1734/6851892
+- UT Jackson School summary: https://www.jsg.utexas.edu/news/2016/07/bird-research-suggests-calling-dinosaurs-may-have-been-tight-lipped

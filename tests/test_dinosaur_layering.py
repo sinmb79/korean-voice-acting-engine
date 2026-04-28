@@ -1,6 +1,7 @@
 import unittest
 
 from kva_engine.synthesis.audio_postprocess import (
+    _apply_bioacoustic_dinosaur_transform,
     _layered_dinosaur_filter_complex,
     _pitch_preserving_tempo_filters,
 )
@@ -26,6 +27,9 @@ class DinosaurLayeringTests(unittest.TestCase):
         filters = _pitch_preserving_tempo_filters(0.28)
 
         self.assertEqual(filters, ["atempo=2.000000", "atempo=1.785714"])
+
+    def test_bioacoustic_transform_is_primary_dinosaur_path(self):
+        self.assertTrue(callable(_apply_bioacoustic_dinosaur_transform))
 
 
 if __name__ == "__main__":

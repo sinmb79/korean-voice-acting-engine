@@ -25,6 +25,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Recorded voice conversion through `kva convert`
 - Multi-role voice candidate workflow through `kva voice-lab`
 - Source-filter vocal tract voice designs through `kva vocal-tract`
+- Bioacoustic dinosaur rendering that removes audible source-speaker identity for fully nonhuman roles
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
 - Long recording segmentation through `kva split-recording`
 - Korean recording script generation, transcript review TSVs, and deterministic dataset splits

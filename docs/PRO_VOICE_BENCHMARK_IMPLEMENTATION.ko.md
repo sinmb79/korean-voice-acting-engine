@@ -60,12 +60,16 @@ KVAE는 이를 아래 구조로 모델링합니다.
 
 ## 다이노사우르스 목소리 수정
 
-이전 다이노사우르스 샘플은 거대한 생물이라기보다 낮게 변조된 사람 목소리에 가까웠습니다. 그래서 v2에서는 단일 피치 변환이 아니라 레이어 구조를 사용합니다.
+이전 다이노사우르스 샘플들은 거대한 비인간 동물이라기보다 낮게 변조된 사람 목소리에 가까웠습니다. 그래서 이제 다이노사우르스 역할은 voice identity conversion이 아니라 bioacoustic synthesis로 처리합니다.
 
-- main transformed voice
-- 매우 낮은 흉강 공명 레이어
-- 거친 목 울림/grit 레이어
-- 지연된 저역 body rumble 레이어
-- 원본 연기 타이밍이 느려진 사람 목소리처럼 무너지지 않도록 길이 보존 pitch 레이어
+- 원본 화자의 정체성은 들리는 신호에서 제거
+- 원본 녹음은 길이, 에너지 곡선, 강약 변화 제어에만 사용
+- 실제 출력은 closed-mouth boom/hoot carrier, 저역 body rumble, throat grit, pressure noise로 합성
+- 이전 layered pitch chain은 fallback/debug 경로로만 유지
 
-아직 최종 neural backend는 아니지만, WORLD/neural renderer를 붙이기 전 제품형 v2 효과로는 훨씬 더 방향이 맞습니다.
+이 방향은 일부 공룡이 포유류식 open-mouth roar보다 저주파 closed-mouth vocalization을 냈을 수 있다는 연구 흐름을 반영합니다.
+
+연구 기준점:
+
+- Riede et al., "Coos, Booms, and Hoots": https://academic.oup.com/evolut/article-abstract/70/8/1734/6851892
+- UT Jackson School 요약: https://www.jsg.utexas.edu/news/2016/07/bird-research-suggests-calling-dinosaurs-may-have-been-tight-lipped
