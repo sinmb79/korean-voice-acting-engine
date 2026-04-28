@@ -103,7 +103,7 @@
 
 ### Phase 5. 크리에이터 사운드 디자인 엔진
 
-상태: 벤치마크 카탈로그와 레시피 CLI는 시작됨. 전체 소스 라이브러리 워크플로와 오디오 레이어 렌더러는 남아 있음.
+상태: 벤치마크 카탈로그, source-library 스캔/검증, 레시피 CLI, 공룡 렌더 진입점은 시작됨. 전체 소스 라이브러리 관리자와 다중 크리처 레이어 렌더러는 남아 있음.
 
 목표:
 
@@ -115,9 +115,9 @@
 
 필요:
 
-- `kva source-library add/scan/validate`
+- `kva source-library add`
 - waveform indexing, tag, source provenance check
-- `kva creature-design render` 기반 동물/폴리/합성 레이어 믹싱
+- 늑대, 괴물, 외계 생명체, 폴리 중심 역할까지 확장된 `kva creature-design` render
 - 영상 클립의 폴리/action spotting
 - A/B/C 후보 생성과 사람 청취 점수
 - 비교, 원본 bypass, 출처/라이선스 표시, export가 가능한 로컬 UI

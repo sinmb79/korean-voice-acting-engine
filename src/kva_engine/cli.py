@@ -21,7 +21,13 @@ from kva_engine.public_voices import (
 )
 from kva_engine.review.audio_review import recording_check, review_audio
 from kva_engine.review.manifest import build_generation_manifest
-from kva_engine.sound_design import build_creature_design_recipe, build_source_library_report
+from kva_engine.sound_design import (
+    build_creature_design_recipe,
+    build_source_library_report,
+    render_creature_design_audio,
+    scan_source_library_directory,
+    validate_source_library_file,
+)
 from kva_engine.ssml import speech_script_to_ssml
 from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert_voice_file
 from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesis_plan, render_voxcpm_speech
@@ -107,6 +113,9 @@ def main(argv: list[str] | None = None) -> int:
         "source-library",
         help="Show the license-safe source library schema for creature and Foley sound design",
     )
+    source_library_parser.add_argument("--scan-dir", help="Scan a local folder for audio source files")
+    source_library_parser.add_argument("--registry", help="Validate a source-library JSON registry")
+    source_library_parser.add_argument("--validate", action="store_true", help="Validate --registry")
     source_library_parser.add_argument("--out", help="Output JSON path")
     source_library_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
@@ -117,6 +126,8 @@ def main(argv: list[str] | None = None) -> int:
     creature_design_parser.add_argument("--role", required=True, choices=sorted(PRESETS))
     creature_design_parser.add_argument("--intent", default="cinematic")
     creature_design_parser.add_argument("--intensity", type=float, default=1.0)
+    creature_design_parser.add_argument("--input", help="Input WAV performance controller for render mode")
+    creature_design_parser.add_argument("--render-out", help="Output WAV path for render mode")
     creature_design_parser.add_argument("--out", help="Output JSON path")
     creature_design_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
@@ -357,8 +368,25 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "benchmarks":
         return _emit(build_professional_benchmark_report(), out=args.out, compact=args.compact)
     if args.command == "source-library":
+        if args.scan_dir:
+            return _emit(scan_source_library_directory(args.scan_dir), out=args.out, compact=args.compact)
+        if args.registry or args.validate:
+            if not args.registry:
+                raise SystemExit("--validate requires --registry.")
+            return _emit(validate_source_library_file(args.registry), out=args.out, compact=args.compact)
         return _emit(build_source_library_report(), out=args.out, compact=args.compact)
     if args.command == "creature-design":
+        if args.input or args.render_out:
+            if not args.input or not args.render_out:
+                raise SystemExit("render mode requires both --input and --render-out.")
+            result = render_creature_design_audio(
+                args.input,
+                args.render_out,
+                role=args.role,
+                intent=args.intent,
+                intensity=args.intensity,
+            )
+            return _emit(result, out=args.out, compact=args.compact) or (0 if result.get("ok") else 1)
         return _emit(
             build_creature_design_recipe(args.role, intent=args.intent, intensity=args.intensity),
             out=args.out,

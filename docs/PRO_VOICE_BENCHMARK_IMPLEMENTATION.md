@@ -60,8 +60,8 @@ KVAE models that as:
 - `kva voice-lab`: multiple role candidates, playlist, manifests, review files
 - `kva review-audio`: objective quality gates
 - `kva benchmarks`: product benchmark report
-- `kva source-library`: source provenance, license, privacy, and AI/synthetic disclosure schema
-- `kva creature-design`: studio-style creature layer recipe
+- `kva source-library`: source provenance, license, privacy, AI/synthetic disclosure schema, local scan, and validation
+- `kva creature-design`: studio-style creature layer recipe and current dinosaur bioacoustic render entrypoint
 
 ## Major Studio Sound Design Benchmark
 
@@ -81,7 +81,9 @@ Current implementation:
 
 ```powershell
 python -m kva_engine source-library --compact
+python -m kva_engine source-library --scan-dir sources\creature --out outputs\source-library.scan.json
 python -m kva_engine creature-design --role dinosaur_giant_roar --compact
+python -m kva_engine creature-design --role dinosaur_giant_roar --input controller.wav --render-out outputs\dinosaur.wav
 ```
 
 The dinosaur recipe explicitly requires `source_speech_audible=false` and `source_voice_identity_retained=false`.

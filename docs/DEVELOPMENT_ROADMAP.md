@@ -103,7 +103,7 @@ Needed:
 
 ### Phase 5. Creator Sound Design Engine
 
-Status: benchmark catalog and recipe CLI started; full source-library workflow and audio-layer renderer still missing.
+Status: benchmark catalog, source-library scan/validation, recipe CLI, and dinosaur render entrypoint started; full source-library manager and multi-creature layer renderer still missing.
 
 Goal:
 
@@ -115,9 +115,9 @@ Goal:
 
 Needed:
 
-- `kva source-library add/scan/validate`
+- `kva source-library add`
 - waveform indexing, tags, and source provenance checks
-- `kva creature-design render` for animal/Foley/synthetic layer mixing
+- broader `kva creature-design` render support for wolf, monster, alien, and Foley-heavy roles
 - Foley and action spotting for video clips
 - A/B/C candidate generation plus human listening score
 - local UI for compare, bypass, source/license display, and export

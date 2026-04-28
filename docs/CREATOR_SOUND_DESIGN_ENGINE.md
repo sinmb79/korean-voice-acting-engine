@@ -33,8 +33,9 @@ For creatures, the human voice is usually not the whole final sound. It can be t
 ## What KVAE Implements Now
 
 - `kva benchmarks` stores voice-acting theory, professional voice product lessons, bioacoustic research, and major-studio sound-design techniques.
-- `kva source-library` exposes the source registry schema and license/privacy rules.
+- `kva source-library` exposes the source registry schema, license/privacy rules, local folder scanning, and registry validation.
 - `kva creature-design --role dinosaur_giant_roar` creates a layer recipe that removes audible human speech identity.
+- `kva creature-design --role dinosaur_giant_roar --input controller.wav --render-out dinosaur.wav` renders the current dinosaur bioacoustic path from a performance controller.
 - `kva convert` and `kva voice-lab` remain the human-character workflow.
 - `kva-bioacoustic-dinosaur-v3` renders dinosaur roles from performance envelope only, not from audible speech identity.
 
@@ -75,9 +76,9 @@ Wolf and monster roles can have clear variants when intelligibility is desired, 
 
 Next implementation phases:
 
-- `kva source-library add/scan/validate`
+- `kva source-library add` for curated manual source records
 - waveform indexing and source tagging
-- `kva creature-design render` to turn recipes into audio layers
+- broader `kva creature-design` audio rendering for wolf, monster, alien, and Foley-heavy roles
 - Foley and action spotting for video clips
 - A/B/C candidate generation with human listening scores
 - local UI with compare, bypass, source/license display, and export

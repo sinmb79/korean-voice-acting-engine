@@ -40,10 +40,12 @@ class ProfessionalBenchmarkTests(unittest.TestCase):
         self.assertIn("nonhuman_bioacoustic_conversion_without_audible_source_identity", alignment["adopted"])
         self.assertIn("studio_sound_design_technique_catalog", alignment["adopted"])
         self.assertIn("source_library_schema_cli", alignment["adopted"])
+        self.assertIn("source_library_scan_validation_cli", alignment["adopted"])
         self.assertIn("creature_design_recipe_cli", alignment["adopted"])
+        self.assertIn("creature_design_dinosaur_render_entrypoint", alignment["adopted"])
         self.assertIn("OpenVoice", alignment["inspired_by"])
         self.assertIn("neural speech-to-speech backend", alignment["remaining"])
-        self.assertIn("creature sound-design render CLI", alignment["remaining"])
+        self.assertIn("multi-creature sound-design render CLI", alignment["remaining"])
 
     def test_benchmarks_cli_outputs_report(self):
         stdout = io.StringIO()

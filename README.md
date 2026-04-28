@@ -108,7 +108,9 @@ Inspect the source-library policy and a creature sound-design recipe:
 
 ```powershell
 python -m kva_engine source-library --compact
+python -m kva_engine source-library --scan-dir sources\creature --out outputs\source-library.scan.json
 python -m kva_engine creature-design --role dinosaur_giant_roar --compact
+python -m kva_engine creature-design --role dinosaur_giant_roar --input my_voice.wav --render-out outputs\dinosaur.wav
 ```
 
 Review the generated audio:

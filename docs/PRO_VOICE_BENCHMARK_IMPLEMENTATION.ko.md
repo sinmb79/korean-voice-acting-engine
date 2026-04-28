@@ -60,8 +60,8 @@ KVAE는 이를 다음 구조로 모델링합니다.
 - `kva voice-lab`: 여러 역할 후보, playlist, manifest, review 파일
 - `kva review-audio`: 객관적 품질 게이트
 - `kva benchmarks`: 제품/제작법 벤치마크 리포트
-- `kva source-library`: 출처, 라이선스, 프라이버시, AI/합성음 고지 스키마
-- `kva creature-design`: 스튜디오식 크리처 레이어 레시피
+- `kva source-library`: 출처, 라이선스, 프라이버시, AI/합성음 고지 스키마, 로컬 스캔, registry 검증
+- `kva creature-design`: 스튜디오식 크리처 레이어 레시피와 현재 공룡 bioacoustic 렌더 진입점
 
 ## 대형 제작사식 사운드 디자인 벤치마크
 
@@ -81,7 +81,9 @@ KVAE는 이제 사운드 디자인을 단순 참고자료가 아니라 프로그
 
 ```powershell
 python -m kva_engine source-library --compact
+python -m kva_engine source-library --scan-dir sources\creature --out outputs\source-library.scan.json
 python -m kva_engine creature-design --role dinosaur_giant_roar --compact
+python -m kva_engine creature-design --role dinosaur_giant_roar --input controller.wav --render-out outputs\dinosaur.wav
 ```
 
 공룡 레시피는 `source_speech_audible=false`, `source_voice_identity_retained=false`를 명시합니다. 즉, 사람 말소리 조음 힌트가 남지 않아야 합니다.

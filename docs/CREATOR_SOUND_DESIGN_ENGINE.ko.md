@@ -33,8 +33,9 @@ flowchart LR
 ## 지금 KVAE에 구현된 것
 
 - `kva benchmarks`: 성우 이론, 전문 음성 제품, 생물음향 연구, 대형 제작사식 사운드 디자인 기법을 JSON으로 제공합니다.
-- `kva source-library`: 소스 라이브러리 스키마와 라이선스/프라이버시 규칙을 제공합니다.
+- `kva source-library`: 소스 라이브러리 스키마, 라이선스/프라이버시 규칙, 로컬 폴더 스캔, registry 검증을 제공합니다.
 - `kva creature-design --role dinosaur_giant_roar`: 인간 말소리 정체성을 제거하는 레이어 레시피를 제공합니다.
+- `kva creature-design --role dinosaur_giant_roar --input controller.wav --render-out dinosaur.wav`: 현재 공룡 bioacoustic 경로를 연기 컨트롤러에서 렌더합니다.
 - `kva convert`, `kva voice-lab`: 인간 캐릭터 음성 변환 흐름입니다.
 - `kva-bioacoustic-dinosaur-v3`: 공룡 배역을 사람 말소리 자체가 아니라 연기의 길이와 에너지 곡선으로만 구동합니다.
 
@@ -73,9 +74,9 @@ flowchart LR
 
 ## 다음 개발 단계
 
-- `kva source-library add/scan/validate`
+- `kva source-library add` 기반 수동 소스 등록
 - 웨이브폼 인덱싱과 소스 태깅
-- `kva creature-design render`로 레시피를 실제 오디오 레이어로 렌더
+- 늑대, 괴물, 외계 생명체, 폴리 중심 역할까지 확장된 `kva creature-design` 오디오 렌더
 - 영상 클립의 액션 스포팅과 폴리 추천
 - A/B/C 후보 생성과 사람 청취 점수
 - 비교, 원본 바이패스, 출처/라이선스 표시, 내보내기를 갖춘 로컬 UI

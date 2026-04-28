@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import json
 from typing import Any
+from pathlib import Path
 
 from kva_engine.benchmarks.pro_voice_products import (
     CREATOR_SOUND_DESIGN_MISSION,
@@ -9,6 +12,7 @@ from kva_engine.benchmarks.pro_voice_products import (
     STUDIO_SOUND_DESIGN_TECHNIQUES,
     VOICE_ACTING_TECHNIQUES,
 )
+from kva_engine.synthesis.bioacoustic import render_bioacoustic_dinosaur
 
 
 SOURCE_LIBRARY_SCHEMA: dict[str, Any] = {
@@ -84,6 +88,9 @@ SOURCE_CATEGORIES: list[dict[str, Any]] = [
 ]
 
 
+AUDIO_SOURCE_EXTENSIONS = {".wav", ".mp3", ".flac", ".m4a", ".ogg", ".aiff", ".aif"}
+
+
 def build_source_library_report() -> dict[str, Any]:
     return {
         "schema_version": SOURCE_LIBRARY_SCHEMA["schema_version"],
@@ -106,6 +113,87 @@ def build_source_library_report() -> dict[str, Any]:
                 "DAW-style timeline editor",
             ],
         },
+    }
+
+
+def scan_source_library_directory(
+    directory: str | Path,
+    *,
+    privacy_level: str = "local_private",
+    default_license: str = "self-recorded",
+    creator_or_provider: str = "local creator",
+) -> dict[str, Any]:
+    root = Path(directory)
+    entries: list[dict[str, Any]] = []
+    if root.exists():
+        for path in sorted(item for item in root.rglob("*") if item.is_file()):
+            if path.suffix.lower() not in AUDIO_SOURCE_EXTENSIONS:
+                continue
+            entries.append(
+                _source_record_from_path(
+                    path,
+                    root=root,
+                    privacy_level=privacy_level,
+                    default_license=default_license,
+                    creator_or_provider=creator_or_provider,
+                )
+            )
+    report = build_source_library_report()
+    report.update(
+        {
+            "schema_version": "kva.source_library.scan.v1",
+            "scan_root": str(root),
+            "exists": root.exists(),
+            "entry_count": len(entries),
+            "entries": entries,
+            "validation": validate_source_library_entries(entries),
+        }
+    )
+    return report
+
+
+def validate_source_library_file(path: str | Path) -> dict[str, Any]:
+    registry_path = Path(path)
+    try:
+        data = json.loads(registry_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {
+            "schema_version": "kva.source_library.validation.v1",
+            "ok": False,
+            "path": str(registry_path),
+            "errors": [{"index": None, "field": "path", "message": "registry file not found"}],
+            "entry_count": 0,
+        }
+    except json.JSONDecodeError as exc:
+        return {
+            "schema_version": "kva.source_library.validation.v1",
+            "ok": False,
+            "path": str(registry_path),
+            "errors": [{"index": None, "field": "json", "message": str(exc)}],
+            "entry_count": 0,
+        }
+    entries = data.get("entries", data if isinstance(data, list) else [])
+    if not isinstance(entries, list):
+        entries = []
+    validation = validate_source_library_entries(entries)
+    validation["path"] = str(registry_path)
+    return validation
+
+
+def validate_source_library_entries(entries: list[dict[str, Any]]) -> dict[str, Any]:
+    errors: list[dict[str, Any]] = []
+    required_fields = SOURCE_LIBRARY_SCHEMA["required_fields"]
+    for index, entry in enumerate(entries):
+        for field in required_fields:
+            if entry.get(field) in (None, "", []):
+                errors.append({"index": index, "field": field, "message": "required field is missing"})
+        if entry.get("privacy_level") not in SOURCE_LIBRARY_SCHEMA["privacy_levels"]:
+            errors.append({"index": index, "field": "privacy_level", "message": "unknown privacy level"})
+    return {
+        "schema_version": "kva.source_library.validation.v1",
+        "ok": not errors,
+        "entry_count": len(entries),
+        "errors": errors,
     }
 
 
@@ -157,6 +245,35 @@ def build_creature_design_recipe(
     return base
 
 
+def render_creature_design_audio(
+    input_path: str | Path,
+    output_path: str | Path,
+    *,
+    role: str,
+    intent: str = "cinematic",
+    intensity: float = 1.0,
+) -> dict[str, Any]:
+    recipe = build_creature_design_recipe(role, intent=intent, intensity=intensity)
+    if _role_family(role) != "dinosaur":
+        return {
+            "ok": False,
+            "schema_version": "kva.creator_sound_design.render.v1",
+            "role": role,
+            "error": "Only dinosaur bioacoustic render is implemented in this sound-design renderer v1.",
+            "recipe": recipe,
+        }
+    render_result = render_bioacoustic_dinosaur(input_path, output_path, role=role)
+    return {
+        "ok": True,
+        "schema_version": "kva.creator_sound_design.render.v1",
+        "role": role,
+        "input": str(input_path),
+        "output": str(output_path),
+        "recipe": recipe,
+        "render": render_result,
+    }
+
+
 def _role_family(role: str) -> str:
     if role.startswith("dinosaur"):
         return "dinosaur"
@@ -165,6 +282,55 @@ def _role_family(role: str) -> str:
     if role.startswith("monster"):
         return "monster"
     return "human_character"
+
+
+def _source_record_from_path(
+    path: Path,
+    *,
+    root: Path,
+    privacy_level: str,
+    default_license: str,
+    creator_or_provider: str,
+) -> dict[str, Any]:
+    relative = path.relative_to(root) if path.is_relative_to(root) else path.name
+    digest = hashlib.sha1(str(relative).encode("utf-8")).hexdigest()[:12]
+    return {
+        "source_id": f"local-{path.stem.lower().replace(' ', '-')}-{digest}",
+        "display_name": path.stem,
+        "source_type": _guess_source_type(path),
+        "origin": str(path),
+        "creator_or_provider": creator_or_provider,
+        "license": default_license,
+        "attribution": creator_or_provider,
+        "ai_or_synthetic_disclosure": "unknown_or_not_synthetic",
+        "permitted_use": "local review until license is confirmed",
+        "privacy_level": privacy_level,
+        "tags": _guess_tags(path),
+        "notes": "Auto-scanned by KVAE; review license, attribution, and source_type before public use.",
+    }
+
+
+def _guess_source_type(path: Path) -> str:
+    lowered = " ".join(part.lower() for part in path.parts)
+    if any(token in lowered for token in ("foley", "footstep", "cloth", "impact")):
+        return "foley_body"
+    if any(token in lowered for token in ("animal", "bird", "dog", "wolf", "horse", "frog")):
+        return "animal_vocal"
+    if any(token in lowered for token in ("ambience", "room", "forest", "cave")):
+        return "environment_space"
+    if any(token in lowered for token in ("synth", "osc", "noise", "rumble")):
+        return "synthetic_body"
+    return "unreviewed_audio_source"
+
+
+def _guess_tags(path: Path) -> list[str]:
+    tokens = []
+    for part in path.with_suffix("").parts:
+        for token in part.replace("-", "_").split("_"):
+            token = token.strip().lower()
+            if token and token not in {".", ".."}:
+                tokens.append(token)
+    return sorted(set(tokens))[:12]
 
 
 def _dinosaur_recipe(role: str, intensity: float) -> dict[str, Any]:
