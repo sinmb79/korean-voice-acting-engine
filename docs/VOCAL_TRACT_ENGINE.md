@@ -30,13 +30,13 @@ The output contains:
 - vocal-tract controls: tract length, formant shift, bandwidth, pharynx width, lip rounding, nasal resonance
 - articulation controls: jaw opening, tongue height, consonant precision, vowel stability
 - performance controls: identity anchor, character distance, tempo, pause scale
-- an ffmpeg-compatible v1 filter chain
+- a KVA-native renderer contract, plus an ffmpeg-compatible legacy filter chain
 
 ## Theory
 
 The design follows source-filter theory: speech can be modeled as a source signal filtered by vocal-tract resonances. Praat describes the same split as changing the source and the filter before synthesis, and WORLD exposes a practical vocoder path through F0, spectral envelope, and aperiodicity.
 
-KVAE v1 is not a full anatomical simulator. It is the control contract for one. Today it drives deterministic filters; later it can drive WORLD, RVC/FreeVC, or a KVAE neural speech-to-speech backend.
+KVAE v1 is not a full anatomical simulator. It is the control contract for one. Today it drives `kva-native-character-v1`, a Python source-filter renderer owned by KVAE; later it can also drive WORLD, RVC/FreeVC, or a KVAE neural speech-to-speech backend.
 
 The product goal is actor-capable voice conversion: one recorded human performance should be able to become many different perceived characters while preserving timing, intent, and Korean delivery. The [professional benchmark implementation](PRO_VOICE_BENCHMARK_IMPLEMENTATION.md) maps this goal to the product lessons KVAE has adopted.
 

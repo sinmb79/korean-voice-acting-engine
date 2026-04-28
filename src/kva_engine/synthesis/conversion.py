@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import wave
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -10,8 +11,15 @@ from kva_engine.acting.presets import get_preset
 from kva_engine.acting.vocal_tract import build_vocal_tract_design
 from kva_engine.benchmarks.pro_voice_products import build_voice_conversion_benchmark_alignment
 from kva_engine.synthesis.audio_postprocess import apply_role_audio_transform, normalize_wav_with_ffmpeg
+from kva_engine.synthesis.native_character import render_native_character_voice
 from kva_engine.training.audio_features import analyze_wav
 from kva_engine.voice_profile import load_voice_profile
+
+
+CONVERSION_ENGINES = {
+    "native": "kva-native-character-v1",
+    "ffmpeg": "kva-convert-ffmpeg-v1",
+}
 
 
 @dataclass
@@ -49,6 +57,7 @@ def build_voice_conversion_plan(
     voice_profile_path: str | Path | None = None,
     normalize: bool = True,
     manifest_path: str | Path | None = None,
+    engine: str = "native",
 ) -> VoiceConversionPlan:
     source = Path(input_path)
     warnings: list[str] = []
@@ -59,8 +68,12 @@ def build_voice_conversion_plan(
     if not role_controls:
         warnings.append("unknown_role")
 
+    engine_id = _engine_id(engine)
+    if engine_id == "unknown":
+        warnings.append("unknown_conversion_engine")
+
     return VoiceConversionPlan(
-        engine="kva-convert-ffmpeg-v1",
+        engine=engine_id,
         input_path=source,
         output_path=Path(output_path),
         role=role,
@@ -84,19 +97,39 @@ def convert_voice_file(plan: VoiceConversionPlan) -> dict[str, Any]:
         return {"ok": False, "error": f"Unknown role: {plan.role}", "plan": plan.to_dict()}
 
     role_output = _role_output_path(plan.output_path)
-    role_postprocess = apply_role_audio_transform(plan.input_path, role_output, role_controls)
-    if not role_postprocess.get("applied"):
-        plan.warnings.append(f"role_audio_transform_{role_postprocess.get('reason', 'failed')}")
+    normalize_postprocess: dict[str, Any]
 
-    postprocess_input = role_output if role_output.exists() else plan.input_path
-    normalize_postprocess: dict[str, Any] = {"applied": False, "reason": "disabled"}
-    if plan.normalize:
-        normalize_postprocess = normalize_wav_with_ffmpeg(postprocess_input, plan.output_path)
-        if not normalize_postprocess.get("applied"):
-            plan.warnings.append(f"audio_normalization_{normalize_postprocess.get('reason', 'failed')}")
+    if _is_native_engine(plan.engine):
+        try:
+            role_postprocess = render_native_character_voice(
+                plan.input_path,
+                plan.output_path,
+                role=plan.role,
+                normalize=plan.normalize,
+            )
+        except (OSError, wave.Error) as exc:
+            plan.warnings.append("native_render_failed")
+            return {"ok": False, "error": f"Native render failed: {exc}", "plan": plan.to_dict(), "warnings": plan.warnings}
+        normalize_postprocess = {
+            "applied": bool(plan.normalize),
+            "engine": "kva-native-peak-normalize",
+            "reason": "native_renderer_peak_stage" if plan.normalize else "disabled",
+            "output": str(plan.output_path),
+        }
     else:
-        plan.output_path.parent.mkdir(parents=True, exist_ok=True)
-        plan.output_path.write_bytes(postprocess_input.read_bytes())
+        role_postprocess = apply_role_audio_transform(plan.input_path, role_output, role_controls)
+        if not role_postprocess.get("applied"):
+            plan.warnings.append(f"role_audio_transform_{role_postprocess.get('reason', 'failed')}")
+
+        postprocess_input = role_output if role_output.exists() else plan.input_path
+        normalize_postprocess = {"applied": False, "reason": "disabled"}
+        if plan.normalize:
+            normalize_postprocess = normalize_wav_with_ffmpeg(postprocess_input, plan.output_path)
+            if not normalize_postprocess.get("applied"):
+                plan.warnings.append(f"audio_normalization_{normalize_postprocess.get('reason', 'failed')}")
+        else:
+            plan.output_path.parent.mkdir(parents=True, exist_ok=True)
+            plan.output_path.write_bytes(postprocess_input.read_bytes())
 
     manifest = {
         "job_id": _job_id(),
@@ -122,7 +155,7 @@ def convert_voice_file(plan: VoiceConversionPlan) -> dict[str, Any]:
             "role_postprocess": role_postprocess,
             "postprocess": normalize_postprocess,
             "warnings": plan.warnings,
-            "note": "This is the local deterministic conversion layer. A neural speech-to-speech backend can replace this engine without changing the CLI contract.",
+            "note": _engine_note(plan.engine),
         },
         "review": {
             "asr": "not_run",
@@ -152,6 +185,29 @@ def convert_voice_file(plan: VoiceConversionPlan) -> dict[str, Any]:
 
 def _role_output_path(output_path: Path) -> Path:
     return output_path.with_name(f"{output_path.stem}.role{output_path.suffix}")
+
+
+def _engine_id(engine: str) -> str:
+    if engine in CONVERSION_ENGINES.values():
+        return engine
+    return CONVERSION_ENGINES.get(engine, "unknown")
+
+
+def _is_native_engine(engine: str) -> bool:
+    return engine == CONVERSION_ENGINES["native"]
+
+
+def _engine_note(engine: str) -> str:
+    if _is_native_engine(engine):
+        return (
+            "This is the KVA-native character renderer. WAV conversion is performed inside "
+            "KVAE using a deterministic source-filter and character-layer DSP path, without "
+            "ffmpeg or another voice conversion program."
+        )
+    return (
+        "This is the legacy ffmpeg-backed deterministic conversion layer. It remains available "
+        "for compatibility and non-WAV preparation while the KVA-native renderer matures."
+    )
 
 
 def _role_controls(role: str) -> dict[str, Any]:

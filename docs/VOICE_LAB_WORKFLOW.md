@@ -1,6 +1,6 @@
 # Voice Lab Workflow
 
-[한국어 문서](VOICE_LAB_WORKFLOW.ko.md)
+[Korean document](VOICE_LAB_WORKFLOW.ko.md)
 
 `kva voice-lab` is the product-style workflow for users who want to record once and generate multiple character voice candidates.
 
@@ -12,6 +12,8 @@ It wraps:
 4. playlist generation
 5. summary report generation
 
+The default conversion engine is `kva-native-character-v1`, KVAE's in-engine WAV renderer. Use `--engine ffmpeg` only when deliberately choosing the legacy filter path.
+
 ## Quick Start
 
 ```powershell
@@ -20,6 +22,7 @@ python -m kva_engine voice-lab `
   --input my_performance.wav `
   --out-dir outputs\voice-lab-demo `
   --group default `
+  --engine native `
   --expected-file script.txt `
   --asr-model base
 ```
@@ -43,6 +46,7 @@ python -m kva_engine voice-lab `
   --input my_performance.wav `
   --out-dir outputs\voice-lab-plan `
   --roles wolf_growl_clear,monster_deep_clear `
+  --engine native `
   --dry-run
 ```
 
@@ -51,7 +55,8 @@ python -m kva_engine voice-lab `
 Named groups:
 
 - `default`: balanced starter set
-- `dialogue`: narrator, teacher, storyteller, villain, child
+- `dialogue`: narrator, teacher, storyteller, villain, child, original drama leads
+- `drama`: original prince/lady leads plus grounded supporting roles
 - `creature`: wolf, monster, dinosaur clear/heavy/fx/roar variants
 - `narration`: calm, documentary, news, storyteller
 - `shorts`: compact creator-oriented set
@@ -68,10 +73,10 @@ Clear roles are preferred for dialogue. Heavy, FX, and roar roles are better tre
 
 ## Remaining Development
 
-`voice-lab` is intentionally built around a stable contract. The deterministic conversion engine can later be replaced or supplemented with:
+`voice-lab` is intentionally built around a stable contract. The deterministic native conversion engine can later be replaced or supplemented with:
 
-- neural speech-to-speech conversion
+- stronger KVAE-native neural speech-to-speech conversion
 - public voice model render adapters
 - a local GUI
-- per-role Korean intelligibility thresholds
+- per-role Korean intelligibility and role-likeness thresholds
 - larger acting datasets

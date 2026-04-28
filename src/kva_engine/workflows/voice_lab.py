@@ -87,6 +87,7 @@ def run_voice_lab_conversion(
     expected_text: str | None = None,
     expected_text_path: str | Path | None = None,
     asr_model: str | None = None,
+    engine: str = "native",
     normalize: bool = True,
     review: bool = True,
     dry_run: bool = False,
@@ -110,6 +111,7 @@ def run_voice_lab_conversion(
             voice_profile_path=voice_profile_path,
             normalize=normalize,
             manifest_path=manifest_path,
+            engine=engine,
         )
         if dry_run:
             result: dict[str, Any] = {
@@ -157,6 +159,7 @@ def run_voice_lab_conversion(
         "input_path": str(source),
         "output_dir": str(destination),
         "roles": selected_roles,
+        "engine": engine,
         "review_enabled": review,
         "asr_model": asr_model,
         "expected_text_path": str(expected_text_path) if expected_text_path else None,

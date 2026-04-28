@@ -2,15 +2,17 @@
 
 [English document](VOICE_LAB_WORKFLOW.md)
 
-`kva voice-lab`은 사용자가 한 번 녹음한 음성을 여러 캐릭터 목소리 후보로 한 번에 만드는 제품형 워크플로입니다.
+`kva voice-lab`은 한 번 녹음한 연기 음성을 여러 캐릭터 음성 후보로 한꺼번에 만드는 제품형 워크플로입니다.
 
-이 명령은 다음을 묶습니다.
+포함하는 작업:
 
 1. 음성 변환
-2. 역할별 manifest 저장
+2. 배역별 manifest 작성
 3. 선택적 오디오 리뷰
 4. playlist 생성
 5. summary report 생성
+
+기본 변환 엔진은 KVAE 자체 WAV 렌더러인 `kva-native-character-v1`입니다. 기존 ffmpeg 필터 경로가 필요할 때만 `--engine ffmpeg`를 사용합니다.
 
 ## 빠른 시작
 
@@ -20,11 +22,12 @@ python -m kva_engine voice-lab `
   --input my_performance.wav `
   --out-dir outputs\voice-lab-demo `
   --group default `
+  --engine native `
   --expected-file script.txt `
   --asr-model base
 ```
 
-출력 폴더에는 다음이 생깁니다.
+출력 폴더에는 다음 파일이 생깁니다.
 
 - `*.wav`
 - `*.result.json`
@@ -43,20 +46,20 @@ python -m kva_engine voice-lab `
   --input my_performance.wav `
   --out-dir outputs\voice-lab-plan `
   --roles wolf_growl_clear,monster_deep_clear `
+  --engine native `
   --dry-run
 ```
 
-## 추천 역할
-
-이름 있는 group:
+## 추천 배역 그룹
 
 - `default`: 균형 잡힌 시작 세트
-- `dialogue`: 내레이터, 선생님, 이야기꾼, 악역, 어린이
-- `creature`: 늑대, 괴물, 공룡 clear/heavy/fx/roar 변형
+- `dialogue`: 내레이터, 교사, 이야기꾼, 악역, 어린이, 오리지널 드라마 주인공
+- `drama`: 21세기 대군부인 계열 남녀 주인공과 보조 배역
+- `creature`: 늑대, 괴물, 공룡 clear/heavy/fx/roar 계열
 - `narration`: calm, documentary, news, storyteller
 - `shorts`: 창작자용 압축 세트
 
-기본 group 역할:
+기본 그룹 배역:
 
 - `calm_narrator`
 - `wolf_growl_clear`
@@ -64,14 +67,14 @@ python -m kva_engine voice-lab `
 - `dinosaur_giant_clear`
 - `child_bright`
 
-대사 전달용은 clear 계열을 우선 사용합니다. heavy, fx, roar 계열은 연출용 질감으로 보는 것이 좋습니다.
+대사는 `*_clear` 계열을 먼저 비교하는 것이 좋습니다. heavy, fx, roar 계열은 명료도보다 캐릭터성과 연출감을 확인하는 후보로 보는 것이 안전합니다.
 
 ## 남은 개발
 
-`voice-lab`은 안정적인 계약을 먼저 만든 것입니다. 이후 내부 엔진은 다음으로 확장할 수 있습니다.
+`voice-lab`은 안정적인 계약을 먼저 만든 워크플로입니다. 앞으로 다음 방향으로 확장합니다.
 
-- neural speech-to-speech 변환
+- 더 강력한 KVAE 자체 neural speech-to-speech 변환
 - 공개 음성 모델 렌더 어댑터
 - 로컬 GUI
-- 역할별 한국어 명료도 기준
-- 더 큰 연기 데이터셋
+- 배역별 한국어 명료도와 역할 유사도 기준
+- 더 큰 한국어 연기 데이터셋

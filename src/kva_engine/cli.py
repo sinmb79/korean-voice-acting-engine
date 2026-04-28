@@ -258,9 +258,15 @@ def main(argv: list[str] | None = None) -> int:
     convert_parser.add_argument("--role", required=True, choices=sorted(PRESETS))
     convert_parser.add_argument("--out", required=True, help="Output WAV path")
     convert_parser.add_argument("--voice-profile", help="Optional voice profile for consent/ownership metadata")
+    convert_parser.add_argument(
+        "--engine",
+        default="native",
+        choices=("native", "ffmpeg"),
+        help="Conversion engine. native is KVAE's in-engine WAV renderer; ffmpeg keeps the legacy filter path.",
+    )
     convert_parser.add_argument("--json-out", help="Output conversion result JSON path")
     convert_parser.add_argument("--manifest-out", help="Output conversion manifest JSON path")
-    convert_parser.add_argument("--no-normalize", action="store_true", help="Skip ffmpeg loudness normalization")
+    convert_parser.add_argument("--no-normalize", action="store_true", help="Skip final normalization")
     convert_parser.add_argument("--dry-run", action="store_true", help="Print the resolved conversion plan without creating audio")
     convert_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
@@ -282,11 +288,17 @@ def main(argv: list[str] | None = None) -> int:
         help="Named role group used when --roles is not provided",
     )
     voice_lab_parser.add_argument("--voice-profile", help="Optional voice profile for consent/ownership metadata")
+    voice_lab_parser.add_argument(
+        "--engine",
+        default="native",
+        choices=("native", "ffmpeg"),
+        help="Conversion engine used for every candidate.",
+    )
     voice_lab_parser.add_argument("--expected-text", help="Expected transcript text for review metrics")
     voice_lab_parser.add_argument("--expected-file", dest="expected_text_path", help="UTF-8 expected transcript file")
     voice_lab_parser.add_argument("--asr-model", help="Optional Whisper model name for per-sample review")
     voice_lab_parser.add_argument("--no-review", action="store_true", help="Skip review JSON generation")
-    voice_lab_parser.add_argument("--no-normalize", action="store_true", help="Skip ffmpeg loudness normalization")
+    voice_lab_parser.add_argument("--no-normalize", action="store_true", help="Skip final normalization")
     voice_lab_parser.add_argument("--dry-run", action="store_true", help="Write plans and summaries without creating WAV files")
     voice_lab_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
@@ -533,6 +545,7 @@ def main(argv: list[str] | None = None) -> int:
             voice_profile_path=args.voice_profile,
             normalize=not args.no_normalize,
             manifest_path=args.manifest_out,
+            engine=args.engine,
         )
         if args.dry_run:
             return _emit({"ok": True, "dry_run": True, "conversion_plan": plan.to_dict()}, out=args.json_out, compact=args.compact)
@@ -544,6 +557,7 @@ def main(argv: list[str] | None = None) -> int:
             output_dir=args.out_dir,
             roles=resolve_voice_lab_roles(roles=args.roles, group=args.group),
             voice_profile_path=args.voice_profile,
+            engine=args.engine,
             expected_text=args.expected_text,
             expected_text_path=args.expected_text_path,
             asr_model=args.asr_model,

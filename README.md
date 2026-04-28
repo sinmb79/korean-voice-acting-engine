@@ -25,8 +25,8 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Original drama lead presets for modern royal male and female character voices
 - Local voice profile resolution through `configs/default_voice.local.json`
 - Local render path for VoxCPM-based Korean voice generation
-- Recorded voice conversion through `kva convert`
-- Multi-role voice candidate workflow through `kva voice-lab`
+- KVA-native recorded voice conversion through `kva convert --engine native`
+- Multi-role voice candidate workflow through `kva voice-lab --engine native`
 - Source-filter vocal tract voice designs through `kva vocal-tract`
 - Bioacoustic dinosaur rendering that removes audible source-speaker identity for fully nonhuman roles
 - Studio-style voice acting and sound-design technique catalog through `kva benchmarks`
@@ -49,7 +49,7 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-KVAE currently uses only the Python standard library for its core tests. Audio rendering and conversion workflows may use local tools such as `ffmpeg`, Whisper, and a local VoxCPM environment when available.
+KVAE currently uses only the Python standard library for its core tests. The default WAV conversion path is `kva-native-character-v1`, a KVAE-owned source-filter renderer that does not call ffmpeg or another voice conversion program. Optional workflows may still use `ffmpeg`, Whisper, and a local VoxCPM environment when explicitly selected.
 
 ## Quick Start
 
@@ -79,8 +79,11 @@ Convert a recorded performance into a character voice:
 python -m kva_engine convert `
   --input my_voice.wav `
   --role monster_deep_clear `
+  --engine native `
   --out outputs\monster.wav
 ```
+
+Use `--engine ffmpeg` only when you deliberately want the legacy filter path or need non-WAV preparation.
 
 Generate multiple voice candidates from one recording:
 
@@ -89,6 +92,7 @@ python -m kva_engine voice-lab `
   --input my_voice.wav `
   --out-dir outputs\voice-lab-demo `
   --group default `
+  --engine native `
   --expected-file script.txt `
   --asr-model base
 ```

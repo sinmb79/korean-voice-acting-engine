@@ -20,7 +20,7 @@ class VoiceConversionTests(unittest.TestCase):
                 role="wolf_growl",
             )
 
-        self.assertEqual(plan.engine, "kva-convert-ffmpeg-v1")
+        self.assertEqual(plan.engine, "kva-native-character-v1")
         self.assertEqual(plan.role, "wolf_growl")
         self.assertTrue(plan.to_dict()["role_controls"]["pitch_shift"] < 0)
         self.assertLess(plan.to_dict()["vocal_tract_design"]["filter"]["formant_shift_ratio"], 1.0)
@@ -52,6 +52,7 @@ class VoiceConversionTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertTrue(result["dry_run"])
         self.assertEqual(result["conversion_plan"]["role"], "monster_deep")
+        self.assertEqual(result["conversion_plan"]["engine"], "kva-native-character-v1")
         self.assertEqual(result["conversion_plan"]["input_path"], str(source))
 
     def test_convert_dry_run_supports_clear_and_fx_creature_roles(self):
@@ -80,6 +81,34 @@ class VoiceConversionTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(result["conversion_plan"]["role"], "dinosaur_giant_clear")
         self.assertGreater(result["conversion_plan"]["role_controls"]["articulation_strength"], 0.5)
+
+    def test_convert_dry_run_supports_legacy_ffmpeg_engine(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = root / "input.wav"
+            source.write_bytes(b"fake wav")
+            json_out = root / "plan.json"
+
+            code = main(
+                [
+                    "convert",
+                    "--input",
+                    str(source),
+                    "--role",
+                    "wolf_growl",
+                    "--engine",
+                    "ffmpeg",
+                    "--out",
+                    str(root / "wolf.wav"),
+                    "--json-out",
+                    str(json_out),
+                    "--dry-run",
+                ]
+            )
+            result = json.loads(json_out.read_text(encoding="utf-8"))
+
+        self.assertEqual(code, 0)
+        self.assertEqual(result["conversion_plan"]["engine"], "kva-convert-ffmpeg-v1")
 
 
 if __name__ == "__main__":
