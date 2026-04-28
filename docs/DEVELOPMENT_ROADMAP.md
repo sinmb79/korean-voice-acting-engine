@@ -20,6 +20,7 @@ Done:
 - raw recording check through `kva recording-check`
 - long recording segmentation through `kva split-recording`
 - Korean recording session scripts through `kva recording-plan`
+- TSV transcript correction workflow through `kva transcript-review`
 - deterministic train/validation/test split manifests through `kva dataset-split`
 - runtime and safety diagnostics through `kva doctor`
 - release quality gates and GitHub Actions CI
@@ -78,7 +79,7 @@ Needed:
 
 ### Phase 4. Korean Acting Dataset Expansion
 
-Status: recording-check, recording-plan, split-recording, and dataset-split v1 exist; reviewed larger datasets still needed.
+Status: recording-check, recording-plan, split-recording, transcript-review, and dataset-split v1 exist; reviewed larger datasets still needed.
 
 Goal:
 
@@ -88,7 +89,6 @@ Goal:
 
 Needed:
 
-- transcript correction workflow
 - backend-specific dataset export formats
 
 ### Phase 5. Local App UI

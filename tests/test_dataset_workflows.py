@@ -1,4 +1,5 @@
 import contextlib
+import csv
 import io
 import json
 import tempfile
@@ -6,7 +7,12 @@ import unittest
 from pathlib import Path
 
 from kva_engine.cli import main
-from kva_engine.training.dataset import build_dataset_split, generate_recording_session_plan
+from kva_engine.training.dataset import (
+    apply_transcript_review_sheet,
+    build_dataset_split,
+    export_transcript_review_sheet,
+    generate_recording_session_plan,
+)
 
 
 class DatasetWorkflowTests(unittest.TestCase):
@@ -98,6 +104,37 @@ class DatasetWorkflowTests(unittest.TestCase):
             self.assertEqual(payload["summary"]["source_segment_count"], 6)
             self.assertTrue(split_path.exists())
 
+    def test_transcript_review_export_and_apply_updates_manifest(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            manifest_path = root / "segments_manifest.json"
+            review_path = root / "review.tsv"
+            reviewed_manifest_path = root / "reviewed_manifest.json"
+            manifest_path.write_text(json.dumps({"segments": _fake_segments(3)}), encoding="utf-8")
+
+            export = export_transcript_review_sheet(
+                manifest_path=manifest_path,
+                output_path=review_path,
+            )
+            rows = _read_tsv(review_path)
+            rows[1]["corrected_transcript"] = "고친 문장입니다."
+            rows[2]["status"] = "drop"
+            rows[2]["notes"] = "잡음이 큼"
+            _write_tsv(review_path, rows)
+
+            result = apply_transcript_review_sheet(
+                manifest_path=manifest_path,
+                review_path=review_path,
+                output_path=reviewed_manifest_path,
+            )
+            reviewed = json.loads(reviewed_manifest_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(export["row_count"], 3)
+            self.assertEqual(result["corrected_count"], 1)
+            self.assertEqual(result["dropped_count"], 1)
+            self.assertEqual(reviewed["segments"][1]["transcript"], "고친 문장입니다.")
+            self.assertFalse(reviewed["segments"][2]["include_in_training"])
+
 
 def _fake_segments(count: int, *, missing_transcripts: set[int] | None = None) -> list[dict]:
     missing_transcripts = missing_transcripts or set()
@@ -114,6 +151,18 @@ def _fake_segments(count: int, *, missing_transcripts: set[int] | None = None) -
         }
         for index in range(1, count + 1)
     ]
+
+
+def _read_tsv(path: Path) -> list[dict[str, str]]:
+    with path.open("r", encoding="utf-8-sig", newline="") as file:
+        return [dict(row) for row in csv.DictReader(file, delimiter="\t")]
+
+
+def _write_tsv(path: Path, rows: list[dict[str, str]]) -> None:
+    with path.open("w", encoding="utf-8-sig", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=list(rows[0]), delimiter="\t")
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 if __name__ == "__main__":

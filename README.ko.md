@@ -29,7 +29,7 @@
 - 한 번의 녹음으로 여러 후보를 만드는 제품형 워크플로: `kva voice-lab`
 - 오디오 품질, ASR, CER/WER 검증 CLI: `kva review-audio`
 - 긴 녹음을 학습 검토용 조각으로 나누는 CLI: `kva split-recording`
-- 한국어 녹음 대본 생성과 deterministic dataset split
+- 한국어 녹음 대본 생성, 전사문 TSV 검토, deterministic dataset split
 - 공개 한국어 AI 음성 카탈로그: 출처, 라이선스, 표기문, AI 음성 고지 포함
 - 테스트 코드와 개발구현서
 
@@ -122,6 +122,7 @@ python -m kva_engine split-recording `
 
 ```powershell
 python -m kva_engine recording-plan --out-dir outputs\recording-plan --target-minutes 30
+python -m kva_engine transcript-review --manifest outputs\segments\segments_manifest.json --out outputs\segments\transcript_review.tsv
 python -m kva_engine dataset-split --manifest outputs\segments\segments_manifest.json --out outputs\dataset_split.json
 ```
 

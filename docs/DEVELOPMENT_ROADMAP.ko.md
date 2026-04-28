@@ -20,6 +20,7 @@
 - `kva recording-check` 기반 원본 녹음 점검
 - `kva split-recording` 기반 긴 녹음 세그먼트 분할
 - `kva recording-plan` 기반 한국어 녹음 세션 대본 생성
+- `kva transcript-review` 기반 TSV 전사문 교정 워크플로
 - `kva dataset-split` 기반 deterministic train/validation/test split manifest
 - `kva doctor` 기반 런타임과 안전 설정 점검
 - 릴리스 품질 게이트와 GitHub Actions CI
@@ -78,7 +79,7 @@
 
 ### Phase 4. 한국어 연기 데이터셋 확장
 
-상태: recording-check, recording-plan, split-recording, dataset-split v1은 구현. 검토된 대규모 데이터셋은 아직 필요.
+상태: recording-check, recording-plan, split-recording, transcript-review, dataset-split v1은 구현. 검토된 대규모 데이터셋은 아직 필요.
 
 목표:
 
@@ -88,7 +89,6 @@
 
 필요:
 
-- 전사문 교정 워크플로
 - backend별 dataset export 포맷
 
 ### Phase 5. 로컬 앱 UI

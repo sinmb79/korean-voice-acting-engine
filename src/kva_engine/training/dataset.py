@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import datetime as dt
+import copy
+import csv
 import json
 import math
 from pathlib import Path
@@ -219,6 +221,9 @@ def build_dataset_split(
     eligible: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     for segment in segments:
+        if segment.get("include_in_training") is False:
+            skipped.append({"index": segment.get("index"), "reason": "excluded_by_transcript_review"})
+            continue
         transcript = segment.get("transcript")
         if require_transcript and not transcript:
             skipped.append({"index": segment.get("index"), "reason": "missing_transcript"})
@@ -276,6 +281,119 @@ def build_dataset_split(
     destination.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     result["split_path"] = str(destination)
     return result
+
+
+def export_transcript_review_sheet(
+    *,
+    manifest_path: str | Path,
+    output_path: str | Path,
+) -> dict[str, Any]:
+    source = Path(manifest_path)
+    manifest = json.loads(source.read_text(encoding="utf-8"))
+    destination = Path(output_path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    segments = list(manifest.get("segments", []))
+
+    with destination.open("w", encoding="utf-8-sig", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=_TRANSCRIPT_REVIEW_FIELDS, delimiter="\t")
+        writer.writeheader()
+        for segment in segments:
+            writer.writerow(
+                {
+                    "index": segment.get("index"),
+                    "file_name": segment.get("file_name"),
+                    "path": segment.get("path"),
+                    "start_sec": segment.get("start_sec"),
+                    "duration_sec": segment.get("duration_sec"),
+                    "transcript": segment.get("transcript") or "",
+                    "corrected_transcript": "",
+                    "status": "keep",
+                    "notes": "",
+                }
+            )
+
+    return {
+        "schema_version": "kva.transcript_review_export.v1",
+        "source_manifest": str(source),
+        "review_sheet_path": str(destination),
+        "row_count": len(segments),
+        "fields": list(_TRANSCRIPT_REVIEW_FIELDS),
+        "instructions": [
+            "Edit corrected_transcript only when the transcript should change.",
+            "Set status to drop for bad, noisy, private, or misread segments.",
+            "Run kva transcript-review again with --review-file to apply the TSV.",
+        ],
+    }
+
+
+def apply_transcript_review_sheet(
+    *,
+    manifest_path: str | Path,
+    review_path: str | Path,
+    output_path: str | Path,
+) -> dict[str, Any]:
+    source = Path(manifest_path)
+    review_file = Path(review_path)
+    manifest = json.loads(source.read_text(encoding="utf-8"))
+    updated = copy.deepcopy(manifest)
+    rows = _read_transcript_review_rows(review_file)
+    row_by_index = {str(row.get("index", "")).strip(): row for row in rows}
+    corrected_count = 0
+    dropped_count = 0
+    missing_review_rows = 0
+
+    for segment in updated.get("segments", []):
+        index = str(segment.get("index", "")).strip()
+        row = row_by_index.get(index)
+        if row is None:
+            missing_review_rows += 1
+            continue
+        status = (row.get("status") or "keep").strip().lower() or "keep"
+        corrected = (row.get("corrected_transcript") or "").strip()
+        notes = (row.get("notes") or "").strip()
+        original = segment.get("transcript")
+        if corrected and corrected != original:
+            segment["transcript_original"] = original
+            segment["transcript"] = corrected
+            corrected_count += 1
+        include_in_training = status not in {"drop", "exclude", "bad", "remove", "ng"}
+        if not include_in_training:
+            dropped_count += 1
+        segment["include_in_training"] = include_in_training
+        segment["transcript_review"] = {
+            "status": status,
+            "notes": notes,
+            "review_file": str(review_file),
+        }
+
+    warnings: list[str] = []
+    if missing_review_rows:
+        warnings.append("segments_missing_review_rows")
+    updated["task"] = "transcript_reviewed_segments"
+    updated["source_manifest"] = str(source)
+    updated["transcript_review"] = {
+        "schema_version": "kva.transcript_review_apply.v1",
+        "review_file": str(review_file),
+        "applied_at": dt.datetime.now(dt.UTC).isoformat(),
+        "corrected_count": corrected_count,
+        "dropped_count": dropped_count,
+        "missing_review_rows": missing_review_rows,
+        "warnings": warnings,
+    }
+    destination = Path(output_path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(updated, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return {
+        "schema_version": "kva.transcript_review_apply.v1",
+        "source_manifest": str(source),
+        "review_file": str(review_file),
+        "reviewed_manifest_path": str(destination),
+        "segment_count": len(updated.get("segments", [])),
+        "corrected_count": corrected_count,
+        "dropped_count": dropped_count,
+        "missing_review_rows": missing_review_rows,
+        "warnings": warnings,
+    }
 
 
 def _should_add_prompt(
@@ -366,3 +484,22 @@ def _split_counts(count: int, *, train_ratio: float, validation_ratio: float) ->
         "validation": validation_count,
         "test": count - train_count - validation_count,
     }
+
+
+_TRANSCRIPT_REVIEW_FIELDS = (
+    "index",
+    "file_name",
+    "path",
+    "start_sec",
+    "duration_sec",
+    "transcript",
+    "corrected_transcript",
+    "status",
+    "notes",
+)
+
+
+def _read_transcript_review_rows(path: Path) -> list[dict[str, str]]:
+    with path.open("r", encoding="utf-8-sig", newline="") as file:
+        reader = csv.DictReader(file, delimiter="\t")
+        return [dict(row) for row in reader]

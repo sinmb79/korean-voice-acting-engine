@@ -9,9 +9,10 @@ flowchart LR
   A["recording-plan"] --> B["사람이 직접 녹음"]
   B --> C["recording-check"]
   C --> D["split-recording"]
-  D --> E["전사문 직접 검토"]
-  E --> F["dataset-split"]
-  F --> G["반복 가능한 모델 평가"]
+  D --> E["transcript-review TSV"]
+  E --> F["사람이 전사문 교정"]
+  F --> G["dataset-split"]
+  G --> H["반복 가능한 모델 평가"]
 ```
 
 ## 1. 녹음 대본 만들기
@@ -42,11 +43,34 @@ python -m kva_engine split-recording `
 
 학습 전에 생성된 WAV 조각과 전사문을 직접 확인해야 합니다. 이 단계에서 NG 테이크, 클리핑, 방 소음, 사적인 내용, 잘못 읽은 문장을 제거합니다.
 
-## 3. 고정 데이터셋 split 만들기
+## 3. 전사문 검토하고 반영하기
+
+```powershell
+python -m kva_engine transcript-review `
+  --manifest outputs\segments\segments_manifest.json `
+  --out outputs\segments\transcript_review.tsv
+```
+
+TSV를 열어 아래처럼 고칩니다.
+
+- 전사문이 틀렸으면 `corrected_transcript`에 수정문 입력
+- 잡음, 사적 내용, 오독이 있으면 `status`를 `drop`으로 변경
+- 필요한 판단 근거는 `notes`에 기록
+
+그 다음 수정 내용을 manifest에 반영합니다.
+
+```powershell
+python -m kva_engine transcript-review `
+  --manifest outputs\segments\segments_manifest.json `
+  --review-file outputs\segments\transcript_review.tsv `
+  --out outputs\segments\reviewed_segments_manifest.json
+```
+
+## 4. 고정 데이터셋 split 만들기
 
 ```powershell
 python -m kva_engine dataset-split `
-  --manifest outputs\segments\segments_manifest.json `
+  --manifest outputs\segments\reviewed_segments_manifest.json `
   --out outputs\dataset_split.json `
   --require-transcript
 ```

@@ -9,9 +9,10 @@ flowchart LR
   A["recording-plan"] --> B["Human recording session"]
   B --> C["recording-check"]
   C --> D["split-recording"]
-  D --> E["Manual transcript review"]
-  E --> F["dataset-split"]
-  F --> G["Repeatable model evaluation"]
+  D --> E["transcript-review TSV"]
+  E --> F["Human transcript edit"]
+  F --> G["dataset-split"]
+  G --> H["Repeatable model evaluation"]
 ```
 
 ## 1. Create A Recording Script
@@ -42,11 +43,34 @@ python -m kva_engine split-recording `
 
 Review the produced WAV files and transcript lines before training. This is where bad takes, clipping, room noise, private content, or incorrect transcripts should be removed.
 
-## 3. Create A Stable Dataset Split
+## 3. Review And Apply Transcripts
+
+```powershell
+python -m kva_engine transcript-review `
+  --manifest outputs\segments\segments_manifest.json `
+  --out outputs\segments\transcript_review.tsv
+```
+
+Edit the TSV:
+
+- use `corrected_transcript` when a transcript should change
+- set `status` to `drop` for bad, noisy, private, or misread segments
+- keep notes in the `notes` column
+
+Then apply the review:
+
+```powershell
+python -m kva_engine transcript-review `
+  --manifest outputs\segments\segments_manifest.json `
+  --review-file outputs\segments\transcript_review.tsv `
+  --out outputs\segments\reviewed_segments_manifest.json
+```
+
+## 4. Create A Stable Dataset Split
 
 ```powershell
 python -m kva_engine dataset-split `
-  --manifest outputs\segments\segments_manifest.json `
+  --manifest outputs\segments\reviewed_segments_manifest.json `
   --out outputs\dataset_split.json `
   --require-transcript
 ```

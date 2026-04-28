@@ -22,7 +22,12 @@ from kva_engine.review.manifest import build_generation_manifest
 from kva_engine.ssml import speech_script_to_ssml
 from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert_voice_file
 from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesis_plan, render_voxcpm_speech
-from kva_engine.training.dataset import build_dataset_split, generate_recording_session_plan
+from kva_engine.training.dataset import (
+    apply_transcript_review_sheet,
+    build_dataset_split,
+    export_transcript_review_sheet,
+    generate_recording_session_plan,
+)
 from kva_engine.training.family_registry import build_family_registry_training_manifest
 from kva_engine.training.native_voice_model import train_native_voice_model
 from kva_engine.training.segmentation import split_wav_on_silence
@@ -159,6 +164,15 @@ def main(argv: list[str] | None = None) -> int:
     dataset_split_parser.add_argument("--validation-ratio", type=float, default=0.1)
     dataset_split_parser.add_argument("--require-transcript", action="store_true")
     dataset_split_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    transcript_review_parser = subparsers.add_parser(
+        "transcript-review",
+        help="Export or apply a TSV transcript review sheet for split recording manifests",
+    )
+    transcript_review_parser.add_argument("--manifest", required=True, help="segments_manifest.json or reviewed manifest JSON")
+    transcript_review_parser.add_argument("--out", required=True, help="Output TSV path or reviewed manifest JSON path")
+    transcript_review_parser.add_argument("--review-file", help="Edited TSV review sheet to apply")
+    transcript_review_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     render_parser = subparsers.add_parser("render", help="Render Korean speech to WAV through the KVAE engine")
     render_parser.add_argument("text", nargs="?", help="Display text to normalize and render")
@@ -364,6 +378,19 @@ def main(argv: list[str] | None = None) -> int:
             require_transcript=args.require_transcript,
         )
         return _emit(split, out=None, compact=args.compact)
+    if args.command == "transcript-review":
+        if args.review_file:
+            result = apply_transcript_review_sheet(
+                manifest_path=args.manifest,
+                review_path=args.review_file,
+                output_path=args.out,
+            )
+        else:
+            result = export_transcript_review_sheet(
+                manifest_path=args.manifest,
+                output_path=args.out,
+            )
+        return _emit(result, out=None, compact=args.compact)
     if args.command == "render":
         script = _build_script(args)
         plan = build_voxcpm_synthesis_plan(
