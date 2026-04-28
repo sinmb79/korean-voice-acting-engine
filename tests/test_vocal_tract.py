@@ -16,6 +16,16 @@ class VocalTractDesignTests(unittest.TestCase):
         self.assertGreater(design.source.pitch_ratio, 1.0)
         self.assertIn("equalizer", ",".join(design.filter_chain))
 
+    def test_twentyfirst_lead_roles_are_distinct_original_character_voices(self):
+        prince = build_vocal_tract_design("twentyfirst_prince_lead")
+        lady = build_vocal_tract_design("twentyfirst_grand_lady_lead")
+
+        self.assertLess(prince.filter.formant_shift_ratio, 0.95)
+        self.assertGreater(lady.filter.formant_shift_ratio, 1.1)
+        self.assertLess(lady.performance.identity_anchor_strength, prince.performance.identity_anchor_strength)
+        self.assertEqual(prince.archetype, "modern_royal_male_lead")
+        self.assertEqual(lady.archetype, "modern_royal_female_lead")
+
     def test_creature_voice_uses_longer_tract_and_rough_source(self):
         design = build_vocal_tract_design("dinosaur_giant_roar")
 

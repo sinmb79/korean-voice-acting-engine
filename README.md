@@ -22,6 +22,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - `speech_text`, `phoneme_text`, and normalization trace generation
 - SSML generation
 - Voice acting presets for narration, documentary, news, teaching, old storyteller, villain, AI assistant, child, wolf, monster, and dinosaur voices
+- Original drama lead presets for modern royal male and female character voices
 - Local voice profile resolution through `configs/default_voice.local.json`
 - Local render path for VoxCPM-based Korean voice generation
 - Recorded voice conversion through `kva convert`

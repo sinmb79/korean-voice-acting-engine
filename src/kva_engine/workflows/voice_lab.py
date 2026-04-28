@@ -21,10 +21,19 @@ VOICE_LAB_ROLE_GROUPS = {
     "default": DEFAULT_VOICE_LAB_ROLES,
     "dialogue": (
         "calm_narrator",
+        "twentyfirst_prince_lead",
+        "twentyfirst_grand_lady_lead",
         "bright_teacher",
         "old_storyteller",
         "villain_low",
         "child_bright",
+    ),
+    "drama": (
+        "twentyfirst_prince_lead",
+        "twentyfirst_grand_lady_lead",
+        "calm_narrator",
+        "villain_low",
+        "old_storyteller",
     ),
     "creature": (
         "wolf_growl_clear",
