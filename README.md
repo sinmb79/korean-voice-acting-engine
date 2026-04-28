@@ -26,6 +26,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Multi-role voice candidate workflow through `kva voice-lab`
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
 - Long recording segmentation through `kva split-recording`
+- Korean recording script generation and deterministic dataset splits
 - Built-in public Korean AI voice catalog with source, license, attribution, and AI-voice disclosure metadata
 - Local training manifest and KVA-native statistical voice model preparation
 - Safety-oriented manifests for consent, privacy, and redistribution boundaries
@@ -146,12 +147,20 @@ python -m kva_engine split-recording `
   --out-dir outputs\segments
 ```
 
+Create a Korean recording session script and a stable dataset split:
+
+```powershell
+python -m kva_engine recording-plan --out-dir outputs\recording-plan --target-minutes 30
+python -m kva_engine dataset-split --manifest outputs\segments\segments_manifest.json --out outputs\dataset_split.json
+```
+
 Private recordings, datasets, LoRA checkpoints, and generated WAV files are intentionally excluded from git.
 
 ## Documentation
 
 - [Codex Training Workflow](docs/CODEX_TRAINING_WORKFLOW.md)
 - [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)
+- [Dataset Preparation Workflow](docs/DATASET_PREP_WORKFLOW.md)
 - [KVAE Render Engine](docs/KVAE_RENDER_ENGINE.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)

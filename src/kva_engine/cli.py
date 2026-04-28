@@ -22,6 +22,7 @@ from kva_engine.review.manifest import build_generation_manifest
 from kva_engine.ssml import speech_script_to_ssml
 from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert_voice_file
 from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesis_plan, render_voxcpm_speech
+from kva_engine.training.dataset import build_dataset_split, generate_recording_session_plan
 from kva_engine.training.family_registry import build_family_registry_training_manifest
 from kva_engine.training.native_voice_model import train_native_voice_model
 from kva_engine.training.segmentation import split_wav_on_silence
@@ -136,6 +137,28 @@ def main(argv: list[str] | None = None) -> int:
     split_recording_parser.add_argument("--padding-ms", type=int, default=80)
     split_recording_parser.add_argument("--out", help="Optional JSON report path")
     split_recording_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    recording_plan_parser = subparsers.add_parser(
+        "recording-plan",
+        help="Create a Korean recording session script for training data collection",
+    )
+    recording_plan_parser.add_argument("--out-dir", required=True, help="Output folder for JSON plan and Markdown script")
+    recording_plan_parser.add_argument("--speaker-id", help="Optional private speaker id for the local plan")
+    recording_plan_parser.add_argument("--target-minutes", type=float, default=30.0)
+    recording_plan_parser.add_argument("--prompt-count", type=int, help="Override target length with an exact prompt count")
+    recording_plan_parser.add_argument("--out", help="Optional JSON report path")
+    recording_plan_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    dataset_split_parser = subparsers.add_parser(
+        "dataset-split",
+        help="Create a deterministic train/validation/test split from a segment manifest",
+    )
+    dataset_split_parser.add_argument("--manifest", required=True, help="segments_manifest.json from kva split-recording")
+    dataset_split_parser.add_argument("--out", required=True, help="Output dataset split JSON path")
+    dataset_split_parser.add_argument("--train-ratio", type=float, default=0.8)
+    dataset_split_parser.add_argument("--validation-ratio", type=float, default=0.1)
+    dataset_split_parser.add_argument("--require-transcript", action="store_true")
+    dataset_split_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     render_parser = subparsers.add_parser("render", help="Render Korean speech to WAV through the KVAE engine")
     render_parser.add_argument("text", nargs="?", help="Display text to normalize and render")
@@ -324,6 +347,23 @@ def main(argv: list[str] | None = None) -> int:
             padding_ms=args.padding_ms,
         )
         return _emit(manifest, out=args.out, compact=args.compact)
+    if args.command == "recording-plan":
+        plan = generate_recording_session_plan(
+            output_dir=args.out_dir,
+            speaker_id=args.speaker_id,
+            target_minutes=args.target_minutes,
+            prompt_count=args.prompt_count,
+        )
+        return _emit(plan, out=args.out, compact=args.compact)
+    if args.command == "dataset-split":
+        split = build_dataset_split(
+            manifest_path=args.manifest,
+            output_path=args.out,
+            train_ratio=args.train_ratio,
+            validation_ratio=args.validation_ratio,
+            require_transcript=args.require_transcript,
+        )
+        return _emit(split, out=None, compact=args.compact)
     if args.command == "render":
         script = _build_script(args)
         plan = build_voxcpm_synthesis_plan(
