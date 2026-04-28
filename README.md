@@ -29,6 +29,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Long recording segmentation through `kva split-recording`
 - Korean recording script generation, transcript review TSVs, and deterministic dataset splits
 - Built-in public Korean AI voice catalog with source, license, attribution, and AI-voice disclosure metadata
+- Professional voice product benchmark report through `kva benchmarks`
 - Local training manifest and KVA-native statistical voice model preparation
 - Safety-oriented manifests for consent, privacy, and redistribution boundaries
 
@@ -89,6 +90,12 @@ Inspect the anatomical source-filter design for a character voice:
 
 ```powershell
 python -m kva_engine vocal-tract --role dinosaur_giant_roar --compact
+```
+
+Show benchmark lessons adopted from professional voice tools:
+
+```powershell
+python -m kva_engine benchmarks --compact
 ```
 
 Review the generated audio:
@@ -176,6 +183,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [Recording Segmentation Workflow](docs/RECORDING_SEGMENTATION.md)
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
 - [Professional Voice Product Benchmark Plan](docs/PRO_VOICE_BENCHMARK_PLAN.md)
+- [Professional Voice Benchmark Implementation](docs/PRO_VOICE_BENCHMARK_IMPLEMENTATION.md)
 - [Public Korean AI Voice Catalog](docs/PUBLIC_VOICE_CATALOG.md)
 - [Release Quality Gates](docs/RELEASE_QUALITY_GATES.md)
 - [Native Training Direction](docs/KVA_NATIVE_TRAINING.md)

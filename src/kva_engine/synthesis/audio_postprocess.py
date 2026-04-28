@@ -70,12 +70,24 @@ def apply_role_audio_transform(
             shutil.copyfile(input_wav, output_wav)
         return {"applied": False, "reason": "ffmpeg_missing", "output": str(output_wav)}
 
+    role = str(role_controls.get("role", ""))
     pitch_shift = float(role_controls.get("pitch_shift", 0.0) or 0.0)
     speed = float(role_controls.get("speed", 1.0) or 1.0)
+    if role in {"dinosaur_giant", "dinosaur_giant_roar"}:
+        return _apply_layered_dinosaur_transform(
+            ffmpeg=ffmpeg,
+            input_wav=input_wav,
+            output_wav=output_wav,
+            role=role,
+            pitch_shift=pitch_shift,
+            speed=speed,
+            sample_rate=sample_rate,
+        )
+
     filters = _role_filter_chain(pitch_shift=pitch_shift, speed=speed, sample_rate=sample_rate)
-    vocal_tract_filters = build_vocal_tract_filter_chain(str(role_controls.get("role", "")))
+    vocal_tract_filters = build_vocal_tract_filter_chain(role)
     filters.extend(vocal_tract_filters)
-    character_filters = _character_filter_chain(str(role_controls.get("role", "")))
+    character_filters = _character_filter_chain(role)
     filters.extend(character_filters)
     if not filters:
         if input_wav != output_wav:
@@ -111,7 +123,7 @@ def apply_role_audio_transform(
         "pitch_shift": pitch_shift,
         "speed": speed,
         "vocal_tract_effects": vocal_tract_filters,
-        "vocal_tract_design": _vocal_tract_design_dict(str(role_controls.get("role", ""))),
+        "vocal_tract_design": _vocal_tract_design_dict(role),
         "character_effects": character_filters,
     }
 
@@ -138,6 +150,133 @@ def _split_atempo(factor: float) -> list[float]:
         factor /= 0.5
     parts.append(factor)
     return parts
+
+
+def _apply_layered_dinosaur_transform(
+    *,
+    ffmpeg: str,
+    input_wav: Path,
+    output_wav: Path,
+    role: str,
+    pitch_shift: float,
+    speed: float,
+    sample_rate: int,
+) -> dict[str, Any]:
+    vocal_tract_filters = build_vocal_tract_filter_chain(role, intensity=1.2 if role == "dinosaur_giant_roar" else 1.0)
+    character_filters = _character_filter_chain(role)
+    base_filters = _role_filter_chain(pitch_shift=pitch_shift, speed=speed, sample_rate=sample_rate)
+    base_filters.extend(vocal_tract_filters)
+    base_filters.extend(character_filters)
+    filter_complex = _layered_dinosaur_filter_complex(
+        role=role,
+        base_filters=base_filters,
+        sample_rate=sample_rate,
+    )
+    output_wav.parent.mkdir(parents=True, exist_ok=True)
+    command = [
+        ffmpeg,
+        "-y",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        str(input_wav),
+        "-filter_complex",
+        filter_complex,
+        "-map",
+        "[mix]",
+        "-ar",
+        str(sample_rate),
+        "-ac",
+        "1",
+        "-c:a",
+        "pcm_s16le",
+        str(output_wav),
+    ]
+    completed = subprocess.run(command, capture_output=True, text=True, check=False)
+    return {
+        "applied": completed.returncode == 0,
+        "engine": "ffmpeg-layered-dinosaur-v2",
+        "command": command,
+        "filter_complex": filter_complex,
+        "returncode": completed.returncode,
+        "stderr": completed.stderr.strip(),
+        "output": str(output_wav),
+        "pitch_shift": pitch_shift,
+        "speed": speed,
+        "vocal_tract_effects": vocal_tract_filters,
+        "vocal_tract_design": _vocal_tract_design_dict(role),
+        "character_effects": character_filters,
+        "layering": {
+            "main": "role transformed voice",
+            "sub": "very low chest resonance layer",
+            "grit": "rough throat layer",
+            "rumble": "delayed low-frequency body resonance",
+        },
+    }
+
+
+def _layered_dinosaur_filter_complex(
+    *,
+    role: str,
+    base_filters: list[str],
+    sample_rate: int,
+) -> str:
+    sub_pitch = 0.28 if role == "dinosaur_giant_roar" else 0.34
+    grit_pitch = 0.48 if role == "dinosaur_giant_roar" else 0.55
+    rumble_pitch = 0.22 if role == "dinosaur_giant_roar" else 0.28
+    base_chain = ",".join(["aformat=channel_layouts=mono", *base_filters, "volume=0.88"])
+    sub_chain = ",".join(
+        [
+            "aformat=channel_layouts=mono",
+            f"asetrate={sample_rate}*{sub_pitch:.6f}",
+            f"aresample={sample_rate}",
+            *_pitch_preserving_tempo_filters(sub_pitch),
+            "highpass=f=22",
+            "lowpass=f=260",
+            "equalizer=f=58:t=q:w=0.7:g=12",
+            "equalizer=f=115:t=q:w=0.8:g=8",
+            "aecho=0.86:0.58:92|178:0.28|0.18",
+            "volume=0.52",
+        ]
+    )
+    grit_chain = ",".join(
+        [
+            "aformat=channel_layouts=mono",
+            f"asetrate={sample_rate}*{grit_pitch:.6f}",
+            f"aresample={sample_rate}",
+            *_pitch_preserving_tempo_filters(grit_pitch),
+            "highpass=f=95",
+            "lowpass=f=3600",
+            "acrusher=bits=8:mix=0.42:mode=1:aa=0.45",
+            "tremolo=f=2.4:d=0.26",
+            "volume=0.24",
+        ]
+    )
+    rumble_chain = ",".join(
+        [
+            "aformat=channel_layouts=mono",
+            f"asetrate={sample_rate}*{rumble_pitch:.6f}",
+            f"aresample={sample_rate}",
+            *_pitch_preserving_tempo_filters(rumble_pitch),
+            "lowpass=f=120",
+            "aecho=0.9:0.72:140|260:0.38|0.25",
+            "volume=0.36",
+        ]
+    )
+    return ";".join(
+        [
+            f"[0:a]{base_chain}[main]",
+            f"[0:a]{sub_chain}[sub]",
+            f"[0:a]{grit_chain}[grit]",
+            f"[0:a]{rumble_chain}[rumble]",
+            "[main][sub][grit][rumble]amix=inputs=4:duration=first:normalize=0,volume=0.70,alimiter=limit=0.92[mix]",
+        ]
+    )
+
+
+def _pitch_preserving_tempo_filters(pitch_factor: float) -> list[str]:
+    return [f"atempo={part:.6f}" for part in _split_atempo(1.0 / pitch_factor)]
 
 
 def _character_filter_chain(role: str) -> list[str]:
@@ -209,23 +348,25 @@ def _character_filter_chain(role: str) -> list[str]:
         ]
     if role == "dinosaur_giant":
         return [
-            "highpass=f=35",
-            "lowpass=f=5800",
-            "equalizer=f=75:t=q:w=1.0:g=7",
-            "equalizer=f=190:t=q:w=0.9:g=4",
-            "acrusher=bits=12:mix=0.14:mode=1:aa=0.65",
-            "tremolo=f=3.8:d=0.09",
-            "aecho=0.88:0.30:85|160:0.25|0.16",
+            "highpass=f=28",
+            "lowpass=f=5000",
+            "equalizer=f=58:t=q:w=0.9:g=9",
+            "equalizer=f=120:t=q:w=0.8:g=7",
+            "equalizer=f=260:t=q:w=0.9:g=4",
+            "acrusher=bits=10:mix=0.26:mode=1:aa=0.55",
+            "tremolo=f=2.9:d=0.18",
+            "aecho=0.9:0.44:105|205:0.34|0.22",
         ]
     if role == "dinosaur_giant_roar":
         return [
-            "highpass=f=30",
-            "lowpass=f=4500",
-            "equalizer=f=60:t=q:w=1.0:g=10",
-            "equalizer=f=150:t=q:w=0.8:g=6",
-            "acrusher=bits=9:mix=0.34:mode=1:aa=0.5",
-            "tremolo=f=3.2:d=0.22",
-            "aecho=0.94:0.5:110|220:0.42|0.28",
+            "highpass=f=24",
+            "lowpass=f=3900",
+            "equalizer=f=48:t=q:w=0.8:g=13",
+            "equalizer=f=95:t=q:w=0.75:g=10",
+            "equalizer=f=190:t=q:w=0.85:g=7",
+            "acrusher=bits=8:mix=0.44:mode=1:aa=0.42",
+            "tremolo=f=2.2:d=0.32",
+            "aecho=0.96:0.64:125|245|390:0.46|0.30|0.18",
         ]
     if role == "child_bright":
         return [

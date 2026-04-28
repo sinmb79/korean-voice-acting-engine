@@ -8,6 +8,7 @@ from typing import Any
 
 from kva_engine.acting.presets import get_preset
 from kva_engine.acting.vocal_tract import build_vocal_tract_design
+from kva_engine.benchmarks.pro_voice_products import build_voice_conversion_benchmark_alignment
 from kva_engine.synthesis.audio_postprocess import apply_role_audio_transform, normalize_wav_with_ffmpeg
 from kva_engine.training.audio_features import analyze_wav
 from kva_engine.voice_profile import load_voice_profile
@@ -32,6 +33,7 @@ class VoiceConversionPlan:
             "role": self.role,
             "role_controls": _role_controls(self.role),
             "vocal_tract_design": _vocal_tract_design(self.role),
+            "benchmark_alignment": build_voice_conversion_benchmark_alignment(),
             "voice_profile": self.voice_profile,
             "normalize": self.normalize,
             "manifest_path": str(self.manifest_path) if self.manifest_path else None,
@@ -116,6 +118,7 @@ def convert_voice_file(plan: VoiceConversionPlan) -> dict[str, Any]:
             "output_path": str(plan.output_path),
             "role_controls": role_controls,
             "vocal_tract_design": _vocal_tract_design(plan.role),
+            "benchmark_alignment": build_voice_conversion_benchmark_alignment(),
             "role_postprocess": role_postprocess,
             "postprocess": normalize_postprocess,
             "warnings": plan.warnings,

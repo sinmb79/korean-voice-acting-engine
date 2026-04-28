@@ -32,6 +32,7 @@
 - 긴 녹음을 학습 검토용 조각으로 나누는 CLI: `kva split-recording`
 - 한국어 녹음 대본 생성, 전사문 TSV 검토, deterministic dataset split
 - 공개 한국어 AI 음성 카탈로그: 출처, 라이선스, 표기문, AI 음성 고지 포함
+- 전문 성우/음성 프로그램 벤치마킹 리포트: `kva benchmarks`
 - 테스트 코드와 개발구현서
 
 ## 빠르게 실행하기
@@ -84,6 +85,12 @@ python -m kva_engine voice-lab `
 
 ```powershell
 python -m kva_engine vocal-tract --role dinosaur_giant_roar --compact
+```
+
+전문 성우/음성 프로그램에서 무엇을 반영했는지도 확인할 수 있습니다.
+
+```powershell
+python -m kva_engine benchmarks --compact
 ```
 
 SSML과 생성 manifest도 바로 만들 수 있습니다.
@@ -167,6 +174,7 @@ python -m compileall -q src
 - `docs/RECORDING_SEGMENTATION.ko.md`: 긴 녹음 세그먼트 분할 워크플로
 - `docs/KVAE_REVIEW_ENGINE.md`: 오디오 품질, ASR, WER/CER 검증 경로
 - `docs/PUBLIC_VOICE_CATALOG.md`: 공개 한국어 AI 음성 카탈로그
+- `docs/PRO_VOICE_BENCHMARK_IMPLEMENTATION.ko.md`: 전문 성우 프로그램 벤치마킹 반영
 - `docs/RELEASE_QUALITY_GATES.md`: 릴리스 품질 게이트
 - `docs/SAFETY_POLICY.md`: 음성/동의/공개 정책
 - `docs/SECURE_DEVELOPMENT.md`: 보안 환경 개발 원칙

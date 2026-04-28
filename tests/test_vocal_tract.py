@@ -19,9 +19,10 @@ class VocalTractDesignTests(unittest.TestCase):
     def test_creature_voice_uses_longer_tract_and_rough_source(self):
         design = build_vocal_tract_design("dinosaur_giant_roar")
 
-        self.assertGreater(design.filter.vocal_tract_length_scale, 1.0)
-        self.assertLess(design.filter.formant_shift_ratio, 1.0)
-        self.assertGreater(design.source.roughness, 0.5)
+        self.assertGreater(design.filter.vocal_tract_length_scale, 1.8)
+        self.assertLess(design.filter.formant_shift_ratio, 0.5)
+        self.assertGreater(design.source.roughness, 0.8)
+        self.assertGreater(design.source.subharmonic_mix, 0.6)
         self.assertIn("low_identity_anchor", design.warnings[0])
 
     def test_filter_chain_is_available_for_conversion_layer(self):

@@ -38,12 +38,25 @@ python -m kva_engine vocal-tract --role monster_deep_clear --compact
 
 KVAE v1은 완전한 해부학 시뮬레이터가 아닙니다. 대신 그 시뮬레이터가 따라야 할 제어 계약입니다. 지금은 deterministic filter를 구동하고, 이후 WORLD, RVC/FreeVC, KVAE neural speech-to-speech backend가 같은 계약을 이어받게 됩니다.
 
+제품 목표는 성우형 음성 변환입니다. 하나의 인간 녹음 연기가 여러 캐릭터 정체성으로 바뀌되, 타이밍, 의도, 한국어 호흡은 보존되어야 합니다. [전문 성우 프로그램 벤치마킹 구현](PRO_VOICE_BENCHMARK_IMPLEMENTATION.ko.md)은 이 목표를 KVAE가 받아들인 제품 교훈과 연결합니다.
+
 ## 캐릭터 예시
 
 - `child_bright`: 짧은 성도, 높은 포먼트, 밝은 고역
 - `wolf_growl_clear`: 긴 성도, 낮은 포먼트, 약간의 비강/거친 원음, 명료도 유지
 - `monster_deep_clear`: 큰 성도, 무거운 인두 공명, 낮은 spectral tilt
 - `dinosaur_giant_roar`: 극단적으로 긴 성도, 매우 낮은 포먼트, 거칠고 subharmonic이 섞인 원음
+
+## 공룡 레이어 V2
+
+`dinosaur_giant`와 `dinosaur_giant_roar`는 이제 단일 저음 필터가 아니라 레이어 방식의 v2 체인을 사용합니다.
+
+- 메인 변환 연기
+- 낮은 흉강 공명 레이어
+- 거친 목/그릿 레이어
+- 지연된 저주파 몸통 울림 레이어
+
+낮은 레이어들은 원본 연기 길이를 보존하도록 보정됩니다. 그래서 단순히 느려진 사람 목소리보다, 보스의 연기 위에 큰 생물의 몸통과 울림이 얹힌 결과를 목표로 합니다.
 
 ## 연구 기준점
 

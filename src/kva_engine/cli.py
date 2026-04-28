@@ -8,6 +8,7 @@ from pathlib import Path
 from kva_engine.acting.planner import plan_voice_acting
 from kva_engine.acting.presets import PRESETS
 from kva_engine.acting.vocal_tract import build_vocal_tract_design
+from kva_engine.benchmarks.pro_voice_products import build_professional_benchmark_report
 from kva_engine.diagnostics import run_doctor
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
@@ -93,6 +94,13 @@ def main(argv: list[str] | None = None) -> int:
     )
     public_voices_parser.add_argument("--out", help="Output JSON path")
     public_voices_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    benchmarks_parser = subparsers.add_parser(
+        "benchmarks",
+        help="Show professional voice product benchmark lessons adopted by KVAE",
+    )
+    benchmarks_parser.add_argument("--out", help="Output JSON path")
+    benchmarks_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     vocal_tract_parser = subparsers.add_parser(
         "vocal-tract",
@@ -328,6 +336,8 @@ def main(argv: list[str] | None = None) -> int:
             out=args.out,
             compact=args.compact,
         )
+    if args.command == "benchmarks":
+        return _emit(build_professional_benchmark_report(), out=args.out, compact=args.compact)
     if args.command == "vocal-tract":
         design = build_vocal_tract_design(
             args.role,
