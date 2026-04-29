@@ -9,6 +9,7 @@ from kva_engine.acting.planner import plan_voice_acting
 from kva_engine.acting.presets import PRESETS
 from kva_engine.acting.vocal_tract import build_vocal_tract_design
 from kva_engine.benchmarks.pro_voice_products import build_professional_benchmark_report
+from kva_engine.capability_router import CAPABILITY_TASK_IDS, build_capability_report
 from kva_engine.diagnostics import run_doctor
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
@@ -110,6 +111,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     benchmarks_parser.add_argument("--out", help="Output JSON path")
     benchmarks_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    capabilities_parser = subparsers.add_parser(
+        "capabilities",
+        help="Route voice tasks to KVAE-supported features or external replacement tools",
+    )
+    capabilities_parser.add_argument("--task", choices=CAPABILITY_TASK_IDS, help="Show one capability route")
+    capabilities_parser.add_argument(
+        "--production-only",
+        action="store_true",
+        help="Hide research-only KVAE experiments from the route list",
+    )
+    capabilities_parser.add_argument("--out", help="Output JSON path")
+    capabilities_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     source_library_parser = subparsers.add_parser(
         "source-library",
@@ -402,6 +416,12 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.command == "benchmarks":
         return _emit(build_professional_benchmark_report(), out=args.out, compact=args.compact)
+    if args.command == "capabilities":
+        return _emit(
+            build_capability_report(task_id=args.task, production_only=args.production_only),
+            out=args.out,
+            compact=args.compact,
+        )
     if args.command == "source-library":
         if args.scan_dir:
             return _emit(scan_source_library_directory(args.scan_dir), out=args.out, compact=args.compact)

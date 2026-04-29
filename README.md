@@ -16,31 +16,32 @@ Korean speech needs careful handling of numbers, dates, English abbreviations, p
 
 KVAE therefore treats Korean normalization, voice profiles, local training preparation, voice polish, render, and review as one engine.
 
-## Current Capabilities
+## Current Production Capabilities
 
 - Korean text normalization for numbers, English, symbols, dates, times, phone numbers, and particles
-- `speech_text`, `phoneme_text`, and normalization trace generation
-- SSML generation
-- Voice acting presets for narration, documentary, news, teaching, old storyteller, villain, AI assistant, child, wolf, monster, and dinosaur voices
-- Original drama lead presets for modern royal male and female character voices
-- Local voice profile resolution through `configs/default_voice.local.json`
-- Local render path for VoxCPM-based Korean voice generation
+- `speech_text`, `phoneme_text`, normalization trace, and SSML generation
 - Korean voice polish through `kva polish`
-- KVA-native recorded voice conversion through `kva convert --engine native`
-- Multi-role voice candidate workflow through `kva voice-lab --engine native`
-- Source-filter vocal tract voice designs through `kva vocal-tract`
-- Bioacoustic dinosaur rendering that removes audible source-speaker identity for fully nonhuman roles
-- Studio-style voice acting and sound-design technique catalog through `kva benchmarks`
-- License-safe source-library schema through `kva source-library`
-- Creature sound-design recipes through `kva creature-design`
+- Use-case presets for cleanup, announcer, shorts, drama, and documentary audio
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
-- Character role-likeness review through `kva review-character`
-- Long recording segmentation through `kva split-recording`
-- Korean recording script generation, transcript review TSVs, and deterministic dataset splits
+- Long recording segmentation, Korean recording scripts, transcript review TSVs, and deterministic dataset splits
 - Built-in public Korean AI voice catalog with source, license, attribution, and AI-voice disclosure metadata
-- Professional voice product benchmark report through `kva benchmarks`
-- Local training manifest and KVA-native statistical voice model preparation
+- Local voice profile resolution through `configs/default_voice.local.json`
 - Safety-oriented manifests for consent, privacy, and redistribution boundaries
+- Capability routing through `kva capabilities`
+- Persona-aware Korean prompt coverage route for NVIDIA Nemotron-Personas-Korea
+
+## External-Routed Or Research Workflows
+
+KVAE no longer presents child, wolf, monster, dinosaur, or unrelated-actor conversion as normal product capability. Those requests are routed:
+
+- Different human speaker: external speech-to-speech tools with consented target voices
+- Child or age-transformed voice: licensed Korean AI voice libraries or a human actor
+- Creature, monster, wolf, or dinosaur: sound-design tools, DAWs, Foley, animal/synthetic layers, and license-safe source libraries
+- Heavy noise, echo, or reverb repair: specialist dialogue repair tools
+- Final video dubbing and subtitle assembly: video/audio editors
+- Voice-Pro: external GPLv3 WebUI for experiments and artifact exchange, not vendored code
+
+The older `kva convert`, `kva voice-lab`, `kva vocal-tract`, and `kva creature-design` commands remain available as inspectable research and planning tools, not as the default product promise.
 
 ## Install
 
@@ -51,7 +52,7 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests
 ```
 
-KVAE currently uses only the Python standard library for its core tests. The default WAV conversion path is `kva-native-character-v1`, a KVAE-owned source-filter renderer that does not call ffmpeg or another voice conversion program. Optional workflows may still use `ffmpeg`, Whisper, and a local VoxCPM environment when explicitly selected.
+KVAE currently uses only the Python standard library for its core tests. The production path is Korean preparation, recording review, and voice polish. Optional workflows may still use `ffmpeg`, Whisper, and a local VoxCPM environment when explicitly selected.
 
 ## Quick Start
 
@@ -75,17 +76,12 @@ python -m kva_engine ssml --file data\sample_input.txt --out outputs\sample.ssml
 python -m kva_engine manifest --script outputs\sample.speech.json --role old_storyteller --out outputs\sample.manifest.json
 ```
 
-Convert a recorded performance into a character voice:
+Check whether a request belongs inside KVAE or should be routed to a specialist program:
 
 ```powershell
-python -m kva_engine convert `
-  --input my_voice.wav `
-  --role monster_deep_clear `
-  --engine native `
-  --out outputs\monster.wav
+python -m kva_engine capabilities --production-only
+python -m kva_engine capabilities --task child_or_age_voice --compact
 ```
-
-Use `--engine ffmpeg` only when you deliberately want the legacy filter path or need non-WAV preparation.
 
 Polish a Korean voice recording for a practical use case:
 
@@ -97,7 +93,7 @@ python -m kva_engine polish `
   --manifest-out outputs\my_voice.announcer.json
 ```
 
-Generate multiple voice candidates from one recording:
+Research-only: generate multiple experimental candidates from one recording:
 
 ```powershell
 python -m kva_engine voice-lab `
@@ -109,7 +105,7 @@ python -m kva_engine voice-lab `
   --asr-model base
 ```
 
-Inspect the anatomical source-filter design for a character voice:
+Research-only: inspect the anatomical source-filter design for a character voice:
 
 ```powershell
 python -m kva_engine vocal-tract --role dinosaur_giant_roar --compact
@@ -121,13 +117,12 @@ Show benchmark lessons adopted from professional voice tools:
 python -m kva_engine benchmarks --compact
 ```
 
-Inspect the source-library policy and a creature sound-design recipe:
+Planning-only: inspect the source-library policy and a creature sound-design recipe:
 
 ```powershell
 python -m kva_engine source-library --compact
 python -m kva_engine source-library --scan-dir sources\creature --out outputs\source-library.scan.json
 python -m kva_engine creature-design --role dinosaur_giant_roar --compact
-python -m kva_engine creature-design --role dinosaur_giant_roar --input my_voice.wav --render-out outputs\dinosaur.wav
 ```
 
 Review the generated audio:
@@ -219,6 +214,8 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [Dataset Preparation Workflow](docs/DATASET_PREP_WORKFLOW.md)
 - [KVAE Render Engine](docs/KVAE_RENDER_ENGINE.md)
 - [Korean Voice Polish Engine](docs/KOREAN_VOICE_POLISH_ENGINE.md)
+- [Capability Routing](docs/CAPABILITY_ROUTING.md)
+- [External Review: Voice-Pro And Nemotron-Personas-Korea](docs/EXTERNAL_REVIEW_VOICE_PRO_NEMOTRON.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
 - [Vocal Tract Voice Design](docs/VOCAL_TRACT_ENGINE.md)
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)

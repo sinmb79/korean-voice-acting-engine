@@ -14,14 +14,17 @@ Done:
 - public Korean AI voice catalog with source, license, attribution, and AI disclosure metadata
 - license-safe public voice install plans through `kva public-voices --install-plan`
 - practical Korean voice polish through `kva polish`
-- deterministic recorded-voice conversion through `kva convert`
-- multi-role candidate generation through `kva voice-lab`
-- source-filter vocal tract voice design through `kva vocal-tract`
+- capability routing through `kva capabilities`
+- persona-script coverage route for NVIDIA Nemotron-Personas-Korea
+- external Voice-Pro route as a separate GPLv3 WebUI, not vendored code
+- experimental deterministic recorded-voice conversion through `kva convert`
+- experimental multi-role candidate generation through `kva voice-lab`
+- research source-filter vocal tract voice design through `kva vocal-tract`
 - professional voice product benchmark reporting through `kva benchmarks`
 - major-studio voice acting and sound-design technique catalog through `kva benchmarks`
 - license-safe source-library schema through `kva source-library`
 - creature sound-design recipes through `kva creature-design`
-- nonhuman bioacoustic dinosaur rendering that removes audible source-speaker identity
+- experimental nonhuman bioacoustic dinosaur rendering
 - named Voice Lab role groups: `default`, `dialogue`, `creature`, `narration`, `shorts`
 - audio review through `kva review-audio`
 - raw recording check through `kva recording-check`
@@ -32,7 +35,7 @@ Done:
 - runtime and safety diagnostics through `kva doctor`
 - release quality gates and GitHub Actions CI
 
-In short: KVAE now has a usable local CLI engine, safety metadata, review reports, voice polish presets, and CI.
+In short: KVAE now has a usable local CLI engine, safety metadata, review reports, voice polish presets, capability routing, and CI.
 
 ## Product Scope Correction
 
@@ -45,6 +48,16 @@ The practical product promise is:
 - improve clarity, tonal balance, loudness, and delivery readiness,
 - provide presets for announcer, shorts, drama, documentary, and cleanup use cases,
 - keep private voice assets local.
+
+Requests outside that promise should be routed:
+
+- different human speaker: external speech-to-speech or licensed target voice provider
+- child or age-transformed voice: licensed Korean AI voice library or human actor
+- creature/dinosaur/monster: sound-design tool, DAW, Foley, animal/synthetic layers, and KVAE source metadata
+- heavy noise/echo/reverb repair: specialist dialogue repair tool
+- final video dubbing/subtitle assembly: video editor
+- local all-in-one open-source experiments: Voice-Pro as a separate GPLv3 tool with WAV/SRT/TXT/JSON artifact exchange only
+- Korean persona diversity: NVIDIA Nemotron-Personas-Korea as text-only persona coverage, not voice data
 
 ## Remaining Development Process
 
@@ -68,7 +81,7 @@ Next refinements:
 
 ### Phase 2. Voice Lab Product Workflow
 
-Status: in progress, usable v1 implemented.
+Status: research-only v1 implemented.
 
 Goal:
 
@@ -99,7 +112,7 @@ Needed:
 
 ### Phase 4. Neural Speech-To-Speech Backend
 
-Status: CLI contract ready; neural backend not complete.
+Status: external-routed for production; internal neural backend not complete.
 
 Research goal:
 
