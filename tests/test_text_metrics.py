@@ -50,6 +50,24 @@ class TextMetricsTests(unittest.TestCase):
         self.assertEqual(result["cer"]["rate"], 0.0)
         self.assertEqual(result["wer"]["rate"], 0.0)
 
+    def test_korean_spacing_and_phonetic_variants_match(self):
+        result = transcript_metrics(
+            "처음 세 초가 지나면, 바로 따라 할 수 있는 한 가지 방법이 꽂히는 순간입니다.",
+            "처음 세초가 지나면 바로 따라할 수 있는 한가지 방법이 꼬치는 순간입니다.",
+        )
+
+        self.assertEqual(result["cer"]["rate"], 0.0)
+        self.assertEqual(result["wer"]["rate"], 0.0)
+
+    def test_native_time_words_match_digit_asr(self):
+        result = transcript_metrics(
+            "오늘 오후 여섯 시부터 약 삼십 분 동안 점검합니다.",
+            "오늘 오후 6시부터 약 30분 동안 점검합니다.",
+        )
+
+        self.assertEqual(result["cer"]["rate"], 0.0)
+        self.assertEqual(result["wer"]["rate"], 0.0)
+
     def test_transcript_metrics_returns_cer_and_wer(self):
         result = transcript_metrics("오늘은 차분하게 말합니다", "오늘은 차분하게 말합니다")
 

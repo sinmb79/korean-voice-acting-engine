@@ -14,6 +14,7 @@ from kva_engine.diagnostics import run_doctor
 from kva_engine.evaluation_suite import build_evaluation_suite_report, write_evaluation_suite
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
+from kva_engine.platform_delivery import build_platform_delivery_suite_report, write_platform_delivery_suite
 from kva_engine.product_quality import USE_CASE_THRESHOLDS, build_product_quality_report
 from kva_engine.public_voices import (
     build_public_voice_install_plan,
@@ -148,6 +149,14 @@ def main(argv: list[str] | None = None) -> int:
     eval_suite_parser.add_argument("--out-dir", help="Write JSON, Markdown, and prompt TXT files to this directory")
     eval_suite_parser.add_argument("--out", help="Output JSON path")
     eval_suite_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    platform_suite_parser = subparsers.add_parser(
+        "platform-suite",
+        help="Show or write platform/situation delivery prompts for Korean voice checks",
+    )
+    platform_suite_parser.add_argument("--out-dir", help="Write JSON, Markdown, and prompt TXT files to this directory")
+    platform_suite_parser.add_argument("--out", help="Output JSON path")
+    platform_suite_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     product_quality_parser = subparsers.add_parser(
         "product-quality",
@@ -472,6 +481,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.out_dir:
             return _emit(write_evaluation_suite(args.out_dir), out=args.out, compact=args.compact)
         return _emit(build_evaluation_suite_report(), out=args.out, compact=args.compact)
+    if args.command == "platform-suite":
+        if args.out_dir:
+            return _emit(write_platform_delivery_suite(args.out_dir), out=args.out, compact=args.compact)
+        return _emit(build_platform_delivery_suite_report(), out=args.out, compact=args.compact)
     if args.command == "product-quality":
         return _emit(
             build_product_quality_report(
