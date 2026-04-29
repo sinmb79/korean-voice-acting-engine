@@ -166,7 +166,7 @@ def normalize_numbers(text: str) -> tuple[str, list[NormalizationTrace]]:
         (re.compile(r"(\d+)\.(\d+)([가-힣A-Za-z%]+)?"), "decimal", _replace_decimal),
         (re.compile(r"(\d+)(M)\b"), "million_suffix", _replace_million_suffix),
         (re.compile(r"(\d+)(%)"), "percent_symbol", _replace_percent_symbol),
-        (re.compile(r"(\d+)([가-힣]+)"), "number_with_unit", _replace_number_with_unit),
+        (re.compile(r"(\d[\d,]*)([가-힣]+)"), "number_with_unit", _replace_number_with_unit),
         (re.compile(r"\b\d[\d,]*\b"), "integer", _replace_integer),
     ]
 
@@ -195,7 +195,7 @@ def _clean_int(source: str) -> int:
 
 
 def _replace_phone(match: re.Match[str]) -> str:
-    return " ".join(read_digits(part, zero="공") for part in match.group(1).split("-"))
+    return ", ".join(read_digits(part, zero="공") for part in match.group(1).split("-"))
 
 
 def _replace_usd(match: re.Match[str]) -> str:

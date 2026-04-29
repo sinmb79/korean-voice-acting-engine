@@ -20,7 +20,7 @@ def normalize_telephone(text: str) -> tuple[str, list[NormalizationTrace]]:
             output_parts.append("플러스 팔이")
             groups = groups[1:]
         output_parts.extend(read_digits(group, zero="공") for group in groups)
-        output = " ".join(output_parts)
+        output = ", ".join(output_parts)
         traces.append(
             NormalizationTrace(
                 source=source,

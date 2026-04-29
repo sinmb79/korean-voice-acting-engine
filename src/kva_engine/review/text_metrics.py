@@ -9,9 +9,30 @@ from typing import Any
 _SPACE_RE = re.compile(r"\s+")
 _PUNCT_RE = re.compile(r"[^\w\s가-힣]", re.UNICODE)
 
+_ASR_ALIAS_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"케이\s*브이\s*에이\s*이|케이브이에이이"), "kvae"),
+    (re.compile(r"\bkvav\b"), "kvae"),
+    (re.compile(r"\bvox\s*cpm\s*2\b"), "voxcpm2"),
+    (re.compile(r"복스\s*cpm\s*2|복스\s*씨피엠\s*(?:투|이|2)|복스씨피엠\s*(?:투|이|2)?"), "voxcpm2"),
+    (re.compile(r"\bonyx\b|오닉스"), "onnx"),
+    (re.compile(r"씨\s*피\s*유|씨피유"), "cpu"),
+)
+
 
 def normalize_for_asr_metric(text: str) -> str:
     normalized = unicodedata.normalize("NFKC", text).lower()
+    normalized = re.sub(r"(?<=\d),(?=\d)", "", normalized)
+    normalized = re.sub(r"(?<!\d)(0\d{1,2})[-\s]+(\d{3,4})[-\s]+(\d{4})(?=\D|$)", r"\1\2\3", normalized)
+    normalized = re.sub(r"(\d+)만\s*(\d+)천\s*원", r"\1만\2천원", normalized)
+    normalized = re.sub(r"([1-9])0{4}원", r"\1만원", normalized)
+    normalized = re.sub(r"([1-9])([1-9])000원", r"\1만\2천원", normalized)
+    normalized = re.sub(r"([가-힣]+구)\s+([가-힣]+대로)", r"\1\2", normalized)
+    normalized = re.sub(r"\b3\s*번", "세 번", normalized)
+    normalized = normalized.replace("%", "퍼센트")
+    normalized = re.sub(r"\bpercent\b", "퍼센트", normalized)
+    normalized = re.sub(r"(\d)\s*(퍼센트|프로)", r"\1 퍼센트", normalized)
+    for pattern, replacement in _ASR_ALIAS_PATTERNS:
+        normalized = pattern.sub(replacement, normalized)
     normalized = _PUNCT_RE.sub(" ", normalized)
     return _SPACE_RE.sub(" ", normalized).strip()
 

@@ -31,8 +31,12 @@ class NumberReaderTests(unittest.TestCase):
         self.assertIn("사월 이십칠일", text)
         self.assertIn("삼 점 오 초", text)
         self.assertIn("버전 이 점 일", text)
-        self.assertIn("공일공 일이삼사 오육칠팔", text)
+        self.assertIn("공일공, 일이삼사, 오육칠팔", text)
         self.assertGreaterEqual(len(traces), 5)
+
+    def test_comma_number_with_korean_unit(self):
+        text, _ = normalize_numbers("35,000원")
+        self.assertEqual(text, "삼만오천 원")
 
     def test_version_with_korean_josa(self):
         text, _ = normalize_numbers("v2.1을 테스트했습니다.")

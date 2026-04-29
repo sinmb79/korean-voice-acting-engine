@@ -11,6 +11,7 @@ DEFAULT_TERMS: dict[str, str] = {
     "OpenAI": "오픈에이아이",
     "ChatGPT": "챗지피티",
     "Codex": "코덱스",
+    "KVAE": "케이, 브이, 에이, 이",
     "API": "에이피아이",
     "AI": "에이아이",
     "TTS": "티티에스",
@@ -24,7 +25,8 @@ DEFAULT_TERMS: dict[str, str] = {
     "CLI": "씨엘아이",
     "MVP": "엠브이피",
     "ONNX": "오닉스",
-    "VoxCPM": "복스씨피엠",
+    "VoxCPM2": "복스 씨피엠 투",
+    "VoxCPM": "복스 씨피엠",
     "g2pK": "지투피케이",
     "CoreaSpeech": "코리아스피치",
     "VibeVoice": "바이브보이스",
@@ -126,7 +128,7 @@ def apply_unknown_acronyms(text: str) -> tuple[str, list[NormalizationTrace]]:
 
     def replace(match: re.Match[str]) -> str:
         source = match.group(1)
-        output = spell_letters(source)
+        output = spell_letters(source, separator=" ")
         traces.append(
             NormalizationTrace(
                 source=source,
