@@ -13,6 +13,7 @@ Done:
 - voice profile resolution for private local voices and public AI voices
 - public Korean AI voice catalog with source, license, attribution, and AI disclosure metadata
 - license-safe public voice install plans through `kva public-voices --install-plan`
+- practical Korean voice polish through `kva polish`
 - deterministic recorded-voice conversion through `kva convert`
 - multi-role candidate generation through `kva voice-lab`
 - source-filter vocal tract voice design through `kva vocal-tract`
@@ -31,19 +32,49 @@ Done:
 - runtime and safety diagnostics through `kva doctor`
 - release quality gates and GitHub Actions CI
 
-In short: KVAE now has a usable local CLI engine, safety metadata, review reports, and CI.
+In short: KVAE now has a usable local CLI engine, safety metadata, review reports, voice polish presets, and CI.
+
+## Product Scope Correction
+
+The current public KVAE product should not promise that one adult recording can become a convincing child, creature, dinosaur, or unrelated professional actor. Those remain research directions.
+
+The practical product promise is:
+
+- take a Korean voice recording or generated Korean narration,
+- keep the speaker identity,
+- improve clarity, tonal balance, loudness, and delivery readiness,
+- provide presets for announcer, shorts, drama, documentary, and cleanup use cases,
+- keep private voice assets local.
 
 ## Remaining Development Process
 
-### Phase 1. Voice Lab Product Workflow
+### Phase 1. Korean Voice Polish Product Workflow
+
+Status: usable v1 implemented.
+
+Goal:
+
+- make one Korean voice recording more usable without pretending it is a different speaker
+- provide practical presets for announcer, shorts, drama, documentary, education, and cleanup
+- write WAV and manifest files with explicit safety boundaries
+- make output easy to review and compare
+
+Next refinements:
+
+- add loudness targets by platform
+- add optional transcript-aware pronunciation review
+- add denoise and room-tone profiling
+- add batch polish for project folders
+
+### Phase 2. Voice Lab Product Workflow
 
 Status: in progress, usable v1 implemented.
 
 Goal:
 
-- make one input recording produce multiple character voice candidates
+- make one input recording produce multiple practical voice-treatment candidates
 - write WAV, manifest, review JSON, playlist, and summary automatically
-- keep the contract stable so deterministic conversion can be replaced by neural speech-to-speech later
+- keep unrealistic child/creature/actor conversion clearly marked as experimental
 
 Next refinements:
 
@@ -51,7 +82,7 @@ Next refinements:
 - add side-by-side comparison reports
 - add listening-score fields for human review
 
-### Phase 2. Public Voice Install And Render Adapters
+### Phase 3. Public Voice Install And Render Adapters
 
 Status: metadata catalog and install plans implemented; actual render adapters still missing.
 
@@ -66,11 +97,11 @@ Needed:
 - provider adapters for MMS, Piper, Coqui, and other license-safe models
 - offline cache layout under a user-selected local folder
 
-### Phase 3. Neural Speech-To-Speech Backend
+### Phase 4. Neural Speech-To-Speech Backend
 
 Status: CLI contract ready; neural backend not complete.
 
-Goal:
+Research goal:
 
 - preserve a user's acting timing, pauses, and emotion
 - change voice identity into selected character voices
@@ -87,7 +118,7 @@ Needed:
 - training/evaluation split
 - objective review plus human listening review
 
-### Phase 4. Korean Acting Dataset Expansion
+### Phase 5. Korean Acting Dataset Expansion
 
 Status: recording-check, recording-plan, split-recording, transcript-review, and dataset-split v1 exist; reviewed larger datasets still needed.
 
@@ -101,7 +132,7 @@ Needed:
 
 - backend-specific dataset export formats
 
-### Phase 5. Creator Sound Design Engine
+### Phase 6. Creator Sound Design Engine
 
 Status: benchmark catalog, source-library scan/validation, recipe CLI, and dinosaur render entrypoint started; full source-library manager and multi-creature layer renderer still missing.
 
@@ -122,7 +153,7 @@ Needed:
 - A/B/C candidate generation plus human listening score
 - local UI for compare, bypass, source/license display, and export
 
-### Phase 6. Local App UI
+### Phase 7. Local App UI
 
 Status: CLI only.
 
@@ -130,7 +161,7 @@ Goal:
 
 - make KVAE usable by non-developers
 - drag in a WAV
-- choose roles
+- choose polish/use-case presets
 - listen, compare, and export
 - show source/license/AI voice disclosure clearly
 
@@ -138,10 +169,10 @@ Needed:
 
 - local desktop or web UI
 - waveform preview
-- role preset editor
+- polish/use-case preset editor
 - review dashboard
 
-### Phase 7. Release Packaging
+### Phase 8. Release Packaging
 
 Status: wheel build smoke passed; full release workflow still needed.
 
@@ -167,7 +198,7 @@ KVAE is not "done" until a user can:
 2. run `kva doctor`,
 3. select a private or public Korean voice profile,
 4. provide Korean text or a recorded performance,
-5. generate multiple voice candidates,
+5. generate polished use-case candidates,
 6. inspect review reports,
 7. see source/license/AI disclosure,
 8. keep private voice data out of public repos,

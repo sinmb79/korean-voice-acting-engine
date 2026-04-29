@@ -31,6 +31,7 @@ from kva_engine.sound_design import (
 )
 from kva_engine.ssml import speech_script_to_ssml
 from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert_voice_file
+from kva_engine.synthesis.voice_polish import POLISH_PRESETS, list_voice_polish_presets, polish_voice_file
 from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesis_plan, render_voxcpm_speech
 from kva_engine.training.dataset import (
     apply_transcript_review_sheet,
@@ -177,6 +178,18 @@ def main(argv: list[str] | None = None) -> int:
     character_review_parser.add_argument("--role", required=True, choices=sorted(PRESETS))
     character_review_parser.add_argument("--out", help="Output character review JSON path")
     character_review_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    polish_parser = subparsers.add_parser(
+        "polish",
+        help="Polish a Korean voice recording for announcer, shorts, drama, or documentary use",
+    )
+    polish_parser.add_argument("--input", help="Input WAV recording")
+    polish_parser.add_argument("--out", help="Output polished WAV path")
+    polish_parser.add_argument("--preset", default="announcer", choices=sorted(POLISH_PRESETS))
+    polish_parser.add_argument("--voice-profile", help="Optional voice profile for ownership metadata")
+    polish_parser.add_argument("--manifest-out", help="Output polish manifest JSON path")
+    polish_parser.add_argument("--list-presets", action="store_true", help="List available polish presets")
+    polish_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     recording_check_parser = subparsers.add_parser("recording-check", help="Check raw recording quality for KVAE training")
     recording_check_parser.add_argument("--audio", required=True, help="Recording WAV path to check")
@@ -457,6 +470,19 @@ def main(argv: list[str] | None = None) -> int:
             role=args.role,
         )
         return _emit(review, out=args.out, compact=args.compact)
+    if args.command == "polish":
+        if args.list_presets:
+            return _emit({"presets": list_voice_polish_presets()}, out=None, compact=args.compact)
+        if not args.input or not args.out:
+            raise SystemExit("kva polish requires --input and --out unless --list-presets is used.")
+        result = polish_voice_file(
+            input_path=args.input,
+            output_path=args.out,
+            preset=args.preset,
+            voice_profile_path=args.voice_profile,
+            manifest_path=args.manifest_out,
+        )
+        return _emit(result, out=None, compact=args.compact)
     if args.command == "recording-check":
         review = recording_check(audio_path=args.audio)
         return _emit(review, out=args.out, compact=args.compact)

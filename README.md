@@ -2,9 +2,9 @@
 
 [Korean README](README.ko.md)
 
-Korean Voice Acting Engine, or KVAE, is a local-first voice acting toolkit for Korean speech. It is designed to turn Korean text and recorded voice performances into reusable voice acting outputs while keeping private voice data on the user's own machine.
+Korean Voice Acting Engine, or KVAE, is a local-first toolkit for Korean speech. Its practical product promise is to help users record or generate Korean voice, polish it for clarity, and prepare it for real creator use cases while keeping private voice data on the user's own machine.
 
-The long-term goal is simple: a user records their own Korean voice, Codex helps prepare and refine the local training assets, and KVAE expands that voice into narrator, teacher, villain, child, wolf, monster, dinosaur, and other character performances.
+KVAE no longer treats "one adult voice becomes any child, creature, or unrelated actor" as the default public promise. Those directions remain research experiments. The current useful path is Korean voice cleanup, announcer-style clarity, and presets for shorts, drama, documentary, announcements, education, and narration.
 
 KVAE also aims to turn major-studio voice and sound-design workflows into a free creator tool. The engine should not copy copyrighted studio sounds; it should reproduce the method: acting direction, source collection, Foley, animal/synthetic layers, transformation, mixing, review, attribution, and disclosure.
 
@@ -14,7 +14,7 @@ Most text-to-speech systems can read text. KVAE is trying to do something more s
 
 Korean speech needs careful handling of numbers, dates, English abbreviations, particles, punctuation, sentence endings, rhythm, and pronunciation. If those details are wrong, the result sounds foreign or mechanical even when the base voice is good.
 
-KVAE therefore treats Korean normalization, voice profiles, role design, local training, conversion, and review as one engine.
+KVAE therefore treats Korean normalization, voice profiles, local training preparation, voice polish, render, and review as one engine.
 
 ## Current Capabilities
 
@@ -25,6 +25,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - Original drama lead presets for modern royal male and female character voices
 - Local voice profile resolution through `configs/default_voice.local.json`
 - Local render path for VoxCPM-based Korean voice generation
+- Korean voice polish through `kva polish`
 - KVA-native recorded voice conversion through `kva convert --engine native`
 - Multi-role voice candidate workflow through `kva voice-lab --engine native`
 - Source-filter vocal tract voice designs through `kva vocal-tract`
@@ -85,6 +86,16 @@ python -m kva_engine convert `
 ```
 
 Use `--engine ffmpeg` only when you deliberately want the legacy filter path or need non-WAV preparation.
+
+Polish a Korean voice recording for a practical use case:
+
+```powershell
+python -m kva_engine polish `
+  --input my_voice.wav `
+  --preset announcer `
+  --out outputs\my_voice.announcer.wav `
+  --manifest-out outputs\my_voice.announcer.json
+```
 
 Generate multiple voice candidates from one recording:
 
@@ -207,6 +218,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)
 - [Dataset Preparation Workflow](docs/DATASET_PREP_WORKFLOW.md)
 - [KVAE Render Engine](docs/KVAE_RENDER_ENGINE.md)
+- [Korean Voice Polish Engine](docs/KOREAN_VOICE_POLISH_ENGINE.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
 - [Vocal Tract Voice Design](docs/VOCAL_TRACT_ENGINE.md)
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)
