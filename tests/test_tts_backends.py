@@ -52,7 +52,7 @@ class TtsBackendsTests(unittest.TestCase):
 
         self.assertEqual(code, 0)
         self.assertEqual(payload["backends"][0]["id"], "moss_tts_nano")
-        self.assertIn("CPU fallback", payload["decision"])
+        self.assertIn("MOSS-TTS-Nano", payload["decision"])
 
 
 if __name__ == "__main__":

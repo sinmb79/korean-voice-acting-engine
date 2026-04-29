@@ -11,8 +11,10 @@ from kva_engine.acting.vocal_tract import build_vocal_tract_design
 from kva_engine.benchmarks.pro_voice_products import build_professional_benchmark_report
 from kva_engine.capability_router import CAPABILITY_TASK_IDS, build_capability_report
 from kva_engine.diagnostics import run_doctor
+from kva_engine.evaluation_suite import build_evaluation_suite_report, write_evaluation_suite
 from kva_engine.korean.g2p_adapter import G2P_MODES
 from kva_engine.korean.normalizer import load_pronunciation_dict, normalize_file, normalize_text
+from kva_engine.product_quality import USE_CASE_THRESHOLDS, build_product_quality_report
 from kva_engine.public_voices import (
     build_public_voice_install_plan,
     get_public_voice,
@@ -138,6 +140,30 @@ def main(argv: list[str] | None = None) -> int:
     )
     tts_backends_parser.add_argument("--out", help="Output JSON path")
     tts_backends_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    eval_suite_parser = subparsers.add_parser(
+        "eval-suite",
+        help="Show or write the fixed Korean evaluation prompt suite for backend comparisons",
+    )
+    eval_suite_parser.add_argument("--out-dir", help="Write JSON, Markdown, and prompt TXT files to this directory")
+    eval_suite_parser.add_argument("--out", help="Output JSON path")
+    eval_suite_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    product_quality_parser = subparsers.add_parser(
+        "product-quality",
+        help="Evaluate whether a generated voice candidate meets KVAE product-quality gates",
+    )
+    product_quality_parser.add_argument("--backend", required=True, choices=TTS_BACKEND_IDS, help="Backend under review")
+    product_quality_parser.add_argument(
+        "--use-case",
+        default="shorts",
+        choices=sorted(USE_CASE_THRESHOLDS),
+        help="Target product use case",
+    )
+    product_quality_parser.add_argument("--review", help="KVAE review-audio JSON path")
+    product_quality_parser.add_argument("--human-scores", help="Human listening score JSON path")
+    product_quality_parser.add_argument("--out", help="Output JSON path")
+    product_quality_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     source_library_parser = subparsers.add_parser(
         "source-library",
@@ -439,6 +465,21 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "tts-backends":
         return _emit(
             build_tts_backend_report(backend_id=args.id, production_only=args.production_only),
+            out=args.out,
+            compact=args.compact,
+        )
+    if args.command == "eval-suite":
+        if args.out_dir:
+            return _emit(write_evaluation_suite(args.out_dir), out=args.out, compact=args.compact)
+        return _emit(build_evaluation_suite_report(), out=args.out, compact=args.compact)
+    if args.command == "product-quality":
+        return _emit(
+            build_product_quality_report(
+                backend_id=args.backend,
+                use_case=args.use_case,
+                review_path=args.review,
+                human_scores_path=args.human_scores,
+            ),
             out=args.out,
             compact=args.compact,
         )

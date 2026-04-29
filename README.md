@@ -30,6 +30,8 @@ KVAE therefore treats Korean normalization, voice profiles, local training prepa
 - Capability routing through `kva capabilities`
 - Persona-aware Korean prompt coverage route for NVIDIA Nemotron-Personas-Korea
 - Reviewed TTS/ASR backend registry through `kva tts-backends`
+- Korean backend evaluation prompts through `kva eval-suite`
+- Product release gates through `kva product-quality`
 
 ## External-Routed Or Research Workflows
 
@@ -93,6 +95,13 @@ Inspect reviewed TTS and ASR backend candidates:
 python -m kva_engine tts-backends --production-only
 python -m kva_engine tts-backends --id moss_tts_nano --compact
 python -m kva_engine tts-backends --id vibevoice_asr --compact
+```
+
+Create a Korean evaluation suite and check whether a candidate is product-ready:
+
+```powershell
+python -m kva_engine eval-suite --out-dir outputs\korean-eval-suite
+python -m kva_engine product-quality --backend voxcpm2 --use-case shorts --compact
 ```
 
 Polish a Korean voice recording for a practical use case:
@@ -230,6 +239,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [External Review: Voice-Pro And Nemotron-Personas-Korea](docs/EXTERNAL_REVIEW_VOICE_PRO_NEMOTRON.md)
 - [External Review: Quark SFX, Narrator AI CLI Skill, Open Generative AI](docs/EXTERNAL_REVIEW_QUARK_NARRATOR_OPEN_GENERATIVE.md)
 - [External Review: MOSS-TTS-Nano, VoxCPM, VibeVoice](docs/EXTERNAL_REVIEW_TTS_BACKENDS.md)
+- [Product Excellence Plan](docs/PRODUCT_EXCELLENCE_PLAN.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
 - [Vocal Tract Voice Design](docs/VOCAL_TRACT_ENGINE.md)
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)

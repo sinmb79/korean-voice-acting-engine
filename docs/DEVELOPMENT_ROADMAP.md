@@ -17,6 +17,8 @@ Done:
 - capability routing through `kva capabilities`
 - reviewed TTS/ASR backend registry through `kva tts-backends`
 - VoxCPM2 set as the current render default with MOSS-TTS-Nano and VibeVoice tracked as candidates
+- Korean evaluation suite through `kva eval-suite`
+- top-tier release gates through `kva product-quality`
 - persona-script coverage route for NVIDIA Nemotron-Personas-Korea
 - external Voice-Pro route as a separate GPLv3 WebUI, not vendored code
 - external Quark SFX, Narrator AI CLI Skill, and Open Generative AI reviews with safe routing boundaries
@@ -80,6 +82,8 @@ Next refinements:
 - add benchmark score fields for Korean intelligibility, speaker similarity, latency, and stability
 - add local machine feasibility checks for each backend
 - add a backend smoke-test harness that can render one private test sentence without committing the audio
+- run the full `kva eval-suite` against VoxCPM2, MOSS-TTS-Nano, and CosyVoice3 on this machine
+- collect human listening scores and promote only candidates that pass `kva product-quality`
 
 ### Phase 1. Korean Voice Polish Product Workflow
 

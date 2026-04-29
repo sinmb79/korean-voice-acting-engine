@@ -17,6 +17,8 @@
 - `kva capabilities` 기반 기능 라우팅
 - `kva tts-backends` 기반 TTS/ASR 백엔드 검토 registry
 - VoxCPM2를 현재 렌더 기본값으로 유지하고 MOSS-TTS-Nano와 VibeVoice를 후보로 추적
+- `kva eval-suite` 기반 한국어 평가 suite
+- `kva product-quality` 기반 최상급 release gate
 - NVIDIA Nemotron-Personas-Korea 페르소나 대본 coverage 라우트
 - Voice-Pro를 별도 GPLv3 WebUI로 다루는 외부 route
 - Quark SFX, Narrator AI CLI Skill, Open Generative AI 외부 검토와 안전한 라우팅 경계
@@ -57,6 +59,8 @@
 - 한국어 명료도, 화자 유사도, latency, 안정성 benchmark score 필드
 - 백엔드별 로컬 PC 실행 가능성 점검
 - 개인 테스트 문장 1개를 렌더하되 오디오는 commit하지 않는 backend smoke-test harness
+- 이 컴퓨터에서 VoxCPM2, MOSS-TTS-Nano, CosyVoice3에 전체 `kva eval-suite` 실행
+- 사람 청취 점수를 수집하고 `kva product-quality`를 통과한 후보만 승격
 
 ### Phase 1. Voice Lab 제품 워크플로
 
