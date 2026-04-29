@@ -34,6 +34,7 @@ from kva_engine.ssml import speech_script_to_ssml
 from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert_voice_file
 from kva_engine.synthesis.voice_polish import POLISH_PRESETS, list_voice_polish_presets, polish_voice_file
 from kva_engine.synthesis.voxcpm import VoxCpmRenderError, build_voxcpm_synthesis_plan, render_voxcpm_speech
+from kva_engine.tts_backends import TTS_BACKEND_IDS, build_tts_backend_report
 from kva_engine.training.dataset import (
     apply_transcript_review_sheet,
     build_dataset_split,
@@ -124,6 +125,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     capabilities_parser.add_argument("--out", help="Output JSON path")
     capabilities_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    tts_backends_parser = subparsers.add_parser(
+        "tts-backends",
+        help="Show reviewed TTS/ASR backend candidates for KVAE Korean voice workflows",
+    )
+    tts_backends_parser.add_argument("--id", choices=TTS_BACKEND_IDS, help="Show one backend")
+    tts_backends_parser.add_argument(
+        "--production-only",
+        action="store_true",
+        help="Show only the currently integrated production backend",
+    )
+    tts_backends_parser.add_argument("--out", help="Output JSON path")
+    tts_backends_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     source_library_parser = subparsers.add_parser(
         "source-library",
@@ -422,6 +436,12 @@ def main(argv: list[str] | None = None) -> int:
             out=args.out,
             compact=args.compact,
         )
+    if args.command == "tts-backends":
+        return _emit(
+            build_tts_backend_report(backend_id=args.id, production_only=args.production_only),
+            out=args.out,
+            compact=args.compact,
+        )
     if args.command == "source-library":
         if args.scan_dir:
             return _emit(scan_source_library_directory(args.scan_dir), out=args.out, compact=args.compact)
@@ -662,9 +682,18 @@ def _emit(data: dict, *, out: str | None, compact: bool) -> int:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(output + "\n", encoding="utf-8")
     else:
-        sys.stdout.write(output + "\n")
+        _write_stdout(output + "\n")
     return 0
 
 
 def _tail(text: str, *, line_count: int = 40) -> str:
     return "\n".join(text.splitlines()[-line_count:])
+
+
+def _write_stdout(text: str) -> None:
+    try:
+        sys.stdout.write(text)
+    except UnicodeEncodeError:
+        encoding = sys.stdout.encoding or "utf-8"
+        safe_text = text.encode(encoding, errors="backslashreplace").decode(encoding, errors="replace")
+        sys.stdout.write(safe_text)

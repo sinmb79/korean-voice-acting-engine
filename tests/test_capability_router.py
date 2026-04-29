@@ -43,6 +43,26 @@ class CapabilityRouterTests(unittest.TestCase):
         self.assertIn("do not treat it as audio training data", replacement["handoff"])
         self.assertIn("voice data or speaker embeddings are available from the persona dataset", route["what_kvae_should_not_claim"])
 
+    def test_korean_tts_backend_selection_exposes_reviewed_candidates(self):
+        route = get_capability_route("korean_tts_backend_selection")
+        replacements = {replacement["name"]: replacement for replacement in route["external_replacements"]}
+
+        self.assertEqual(route["production_policy"], "kvae_supported")
+        self.assertEqual(route["default_handler"], "kva tts-backends")
+        self.assertIn("MOSS-TTS-Nano", replacements)
+        self.assertEqual(replacements["MOSS-TTS-Nano"]["license"], "Apache-2.0")
+        self.assertIn("VibeVoice-Realtime-0.5B", replacements)
+        self.assertIn("VoxCPM2", route["what_kvae_should_do"][0])
+
+    def test_long_form_asr_routes_to_vibevoice_asr(self):
+        route = get_capability_route("long_form_asr_and_diarization")
+        replacement = route["external_replacements"][0]
+
+        self.assertEqual(route["production_policy"], "external_replacement")
+        self.assertEqual(replacement["name"], "VibeVoice-ASR")
+        self.assertIn("60-minute", replacement["best_for"])
+        self.assertIn("private voice recordings", route["what_kvae_should_not_claim"][-1])
+
     def test_voice_pro_is_external_due_to_license_boundary(self):
         route = get_capability_route("different_human_speaker")
         voice_pro = [replacement for replacement in route["external_replacements"] if replacement["name"] == "Voice-Pro"]
@@ -50,6 +70,36 @@ class CapabilityRouterTests(unittest.TestCase):
         self.assertEqual(len(voice_pro), 1)
         self.assertEqual(voice_pro[0]["license"], "GPL-3.0")
         self.assertIn("do not copy", voice_pro[0]["handoff"])
+
+    def test_sound_effect_library_intake_requires_license_gate(self):
+        route = get_capability_route("sound_effect_library_intake")
+        quark = route["external_replacements"][0]
+
+        self.assertEqual(route["production_policy"], "kvae_supported")
+        self.assertEqual(route["default_handler"], "kva source-library")
+        self.assertEqual(quark["license"], "unverified")
+        self.assertIn("do not import audio", quark["handoff"])
+        self.assertIn("permission to redistribute third-party SFX inside KVAE", route["what_kvae_should_not_claim"])
+
+    def test_narrator_ai_is_external_video_narration_route(self):
+        route = get_capability_route("external_video_narration_api")
+        replacement = route["external_replacements"][0]
+
+        self.assertEqual(route["production_policy"], "external_replacement")
+        self.assertEqual(replacement["name"], "Narrator AI CLI Skill")
+        self.assertEqual(replacement["license"], "MIT")
+        self.assertIn("NARRATOR_APP_KEY", replacement["handoff"])
+        self.assertIn("confirm before selecting or submitting resources", replacement["workflow_lessons"])
+
+    def test_open_generative_ai_is_visual_lipsync_external_route(self):
+        route = get_capability_route("visual_generation_lipsync")
+        replacement = route["external_replacements"][0]
+
+        self.assertEqual(route["production_policy"], "external_replacement")
+        self.assertEqual(replacement["name"], "Open Generative AI")
+        self.assertIn("README says MIT", replacement["license"])
+        self.assertIn("no-filter", replacement["safety_note"])
+        self.assertTrue(any("image or video generator" in claim for claim in route["what_kvae_should_not_claim"]))
 
     def test_capabilities_cli_outputs_requested_task(self):
         with contextlib.redirect_stdout(io.StringIO()) as stdout:

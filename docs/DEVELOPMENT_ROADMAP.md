@@ -15,8 +15,11 @@ Done:
 - license-safe public voice install plans through `kva public-voices --install-plan`
 - practical Korean voice polish through `kva polish`
 - capability routing through `kva capabilities`
+- reviewed TTS/ASR backend registry through `kva tts-backends`
+- VoxCPM2 set as the current render default with MOSS-TTS-Nano and VibeVoice tracked as candidates
 - persona-script coverage route for NVIDIA Nemotron-Personas-Korea
 - external Voice-Pro route as a separate GPLv3 WebUI, not vendored code
+- external Quark SFX, Narrator AI CLI Skill, and Open Generative AI reviews with safe routing boundaries
 - experimental deterministic recorded-voice conversion through `kva convert`
 - experimental multi-role candidate generation through `kva voice-lab`
 - research source-filter vocal tract voice design through `kva vocal-tract`
@@ -57,9 +60,26 @@ Requests outside that promise should be routed:
 - heavy noise/echo/reverb repair: specialist dialogue repair tool
 - final video dubbing/subtitle assembly: video editor
 - local all-in-one open-source experiments: Voice-Pro as a separate GPLv3 tool with WAV/SRT/TXT/JSON artifact exchange only
+- reviewed TTS candidates: VoxCPM2 as current default, MOSS-TTS-Nano as CPU/ONNX fallback candidate, VibeVoice as research-only for Korean TTS and candidate long-form ASR
 - Korean persona diversity: NVIDIA Nemotron-Personas-Korea as text-only persona coverage, not voice data
 
 ## Remaining Development Process
+
+### Phase 0. Backend And External Tool Registry
+
+Status: v1 implemented through `kva capabilities` and `kva tts-backends`.
+
+Goal:
+
+- prevent KVAE from confusing shipped features with interesting external tools
+- track license, runtime, Korean support, and safety boundaries before integration
+- keep VoxCPM2 as the default until another backend passes Korean quality review
+
+Next refinements:
+
+- add benchmark score fields for Korean intelligibility, speaker similarity, latency, and stability
+- add local machine feasibility checks for each backend
+- add a backend smoke-test harness that can render one private test sentence without committing the audio
 
 ### Phase 1. Korean Voice Polish Product Workflow
 

@@ -13,6 +13,13 @@
 - private local voice와 public AI voice profile 해석
 - 출처, 라이선스, 표기문, AI 음성 고지를 포함한 공개 한국어 AI 음성 카탈로그
 - `kva public-voices --install-plan` 기반 라이선스 안전 공개 음성 설치 계획
+- `kva polish` 기반 실사용 한국어 음성 폴리싱
+- `kva capabilities` 기반 기능 라우팅
+- `kva tts-backends` 기반 TTS/ASR 백엔드 검토 registry
+- VoxCPM2를 현재 렌더 기본값으로 유지하고 MOSS-TTS-Nano와 VibeVoice를 후보로 추적
+- NVIDIA Nemotron-Personas-Korea 페르소나 대본 coverage 라우트
+- Voice-Pro를 별도 GPLv3 WebUI로 다루는 외부 route
+- Quark SFX, Narrator AI CLI Skill, Open Generative AI 외부 검토와 안전한 라우팅 경계
 - `kva convert` 기반 녹음 음성 변환
 - `kva voice-lab` 기반 여러 캐릭터 후보 생성
 - `kva vocal-tract` 기반 source-filter 성도 음성 설계
@@ -31,9 +38,25 @@
 - `kva doctor` 기반 런타임과 안전 설정 점검
 - release quality gate와 GitHub Actions CI
 
-짧게 말하면, KVAE는 현재 로컬 CLI 엔진, 안전 메타데이터, 리뷰 리포트, 벤치마크 카탈로그, CI를 갖춘 상태입니다.
+짧게 말하면, KVAE는 현재 로컬 CLI 엔진, 안전 메타데이터, 리뷰 리포트, 음성 폴리싱, 백엔드 registry, 기능 라우팅, 벤치마크 카탈로그, CI를 갖춘 상태입니다.
 
 ## 남은 개발 과정
+
+### Phase 0. 백엔드와 외부 도구 registry
+
+상태: `kva capabilities`와 `kva tts-backends` 기반 v1 구현.
+
+목표:
+
+- 실제 탑재 기능과 흥미로운 외부 도구를 혼동하지 않게 만들기
+- 통합 전 license, runtime, 한국어 지원, 안전 경계를 추적
+- 다른 백엔드가 한국어 품질 검수를 통과하기 전까지 VoxCPM2를 기본값으로 유지
+
+다음 보강:
+
+- 한국어 명료도, 화자 유사도, latency, 안정성 benchmark score 필드
+- 백엔드별 로컬 PC 실행 가능성 점검
+- 개인 테스트 문장 1개를 렌더하되 오디오는 commit하지 않는 backend smoke-test harness
 
 ### Phase 1. Voice Lab 제품 워크플로
 

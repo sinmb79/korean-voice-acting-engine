@@ -12,6 +12,7 @@ KVAE의 제품 경계를 더 엄격하게 정리했습니다.
 $env:PYTHONPATH = "src"
 python -m kva_engine capabilities --production-only
 python -m kva_engine capabilities --task child_or_age_voice --compact
+python -m kva_engine tts-backends --production-only
 ```
 
 ## KVAE 제품 범위
@@ -21,6 +22,8 @@ python -m kva_engine capabilities --task child_or_age_voice --compact
 - `kva normalize`, `kva ssml`, `kva cast`: 한국어 음성용 대본 준비
 - `kva recording-check`, `kva review-audio`, 학습 데이터 준비 명령
 - `kva polish`: cleanup, announcer, shorts, drama, documentary 프리셋 기반 음성 손질
+- `kva tts-backends`: 검토된 TTS/ASR 백엔드 상태와 선택 기준
+- `kva source-library`: 음원 출처 라이브러리 schema와 라이선스 gate
 
 이 기능들은 원래 화자의 정체성을 보존합니다. 새로운 성우, 아이, 괴물, 늑대, 공룡 목소리를 만든다고 약속하지 않습니다.
 
@@ -33,7 +36,21 @@ python -m kva_engine capabilities --task child_or_age_voice --compact
 - 크리처/괴물/공룡: [Krotos Dehumaniser 2](https://www.krotosaudio.com/dehumaniser2/)와 DAW, 그리고 라이선스 안전한 동물/폴리/합성 소스
 - 심한 노이즈/반향 복원: [iZotope RX Dialogue Isolate](https://www.izotope.com/en/products/rx/features/dialogue-isolate), [Adobe Podcast Enhance Speech](https://podcast.adobe.com/en/enhance-speech-v2), [Descript Studio Sound](https://help.descript.com/hc/en-us/articles/10327603613837-Studio-Sound)
 - 로컬 통합 실험: [Voice-Pro](https://github.com/abus-aikorea/voice-pro)는 ASR, 자막, 번역, TTS, 보이스 클로닝 테스트용 GPLv3 WebUI로 별도 실행합니다. KVAE는 WAV/SRT/TXT/JSON 산출물만 주고받고 코드는 복사하지 않습니다.
+- 영상 내레이션 API workflow: [Narrator AI CLI Skill](https://github.com/NarratorAI-Studio/narrator-ai-cli-skill)은 `NARRATOR_APP_KEY`와 명시적 resource/task 확인이 필요한 별도 MIT agent workflow로만 사용합니다.
+- 최종 시각/립싱크 조립: [Open Generative AI](https://github.com/Anil-matcha/Open-Generative-AI)는 라이선스와 안전 검토 뒤 별도 이미지/영상/립싱크 studio로만 사용합니다.
 - 영상 조립/자막/최종 편집: Vrew, DaVinci Resolve/Fairlight, 또는 별도 영상 편집기
+
+## TTS와 ASR 백엔드 범위
+
+KVAE는 현재 [VoxCPM2](https://github.com/OpenBMB/VoxCPM)를 `kva render --engine voxcpm`의 기본 렌더 백엔드로 둡니다. Apache-2.0이며 한국어가 공식 지원 언어에 포함됩니다.
+
+[MOSS-TTS-Nano](https://github.com/OpenMOSS/MOSS-TTS-Nano)는 Apache-2.0 기반의 가벼운 CPU/ONNX 연구 후보입니다. 한국어가 지원 언어에 포함되어 있지만, KVAE에서 한국어 명료도 검수를 통과하기 전까지는 후보로 둡니다.
+
+[VibeVoice](https://github.com/microsoft/VibeVoice)는 MIT입니다. VibeVoice-Realtime은 한국어가 실험적 지원이므로 연구 후보로만 둡니다. VibeVoice-ASR은 장문 ASR/화자분리 검수 후보이지, 현재 KVAE core dependency가 아닙니다.
+
+## 음향효과 라이브러리 범위
+
+검토한 Quark 공유자료 `百万剪辑狮的音效库`는 큰 SFX collection으로 보이지만, 확인한 공유 metadata 안에서는 재배포권이나 상업 사용권이 보이지 않았습니다. KVAE는 라이선스가 확인되기 전까지 분류 참고자료로만 사용합니다. 음원 파일을 KVAE에 직접 넣거나 재배포하지 않습니다.
 
 ## 페르소나 데이터셋 범위
 

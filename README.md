@@ -29,6 +29,7 @@ KVAE therefore treats Korean normalization, voice profiles, local training prepa
 - Safety-oriented manifests for consent, privacy, and redistribution boundaries
 - Capability routing through `kva capabilities`
 - Persona-aware Korean prompt coverage route for NVIDIA Nemotron-Personas-Korea
+- Reviewed TTS/ASR backend registry through `kva tts-backends`
 
 ## External-Routed Or Research Workflows
 
@@ -40,6 +41,9 @@ KVAE no longer presents child, wolf, monster, dinosaur, or unrelated-actor conve
 - Heavy noise, echo, or reverb repair: specialist dialogue repair tools
 - Final video dubbing and subtitle assembly: video/audio editors
 - Voice-Pro: external GPLv3 WebUI for experiments and artifact exchange, not vendored code
+- MOSS-TTS-Nano: Apache-2.0 CPU/ONNX research candidate for lightweight local Korean TTS fallback
+- VibeVoice: MIT research candidate; Realtime TTS is not production Korean, while ASR may help long-form transcript review
+- Narrator AI CLI Skill and Open Generative AI: external video narration, visual generation, and lip-sync tools, not KVAE core dependencies
 
 The older `kva convert`, `kva voice-lab`, `kva vocal-tract`, and `kva creature-design` commands remain available as inspectable research and planning tools, not as the default product promise.
 
@@ -81,6 +85,14 @@ Check whether a request belongs inside KVAE or should be routed to a specialist 
 ```powershell
 python -m kva_engine capabilities --production-only
 python -m kva_engine capabilities --task child_or_age_voice --compact
+```
+
+Inspect reviewed TTS and ASR backend candidates:
+
+```powershell
+python -m kva_engine tts-backends --production-only
+python -m kva_engine tts-backends --id moss_tts_nano --compact
+python -m kva_engine tts-backends --id vibevoice_asr --compact
 ```
 
 Polish a Korean voice recording for a practical use case:
@@ -216,6 +228,8 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [Korean Voice Polish Engine](docs/KOREAN_VOICE_POLISH_ENGINE.md)
 - [Capability Routing](docs/CAPABILITY_ROUTING.md)
 - [External Review: Voice-Pro And Nemotron-Personas-Korea](docs/EXTERNAL_REVIEW_VOICE_PRO_NEMOTRON.md)
+- [External Review: Quark SFX, Narrator AI CLI Skill, Open Generative AI](docs/EXTERNAL_REVIEW_QUARK_NARRATOR_OPEN_GENERATIVE.md)
+- [External Review: MOSS-TTS-Nano, VoxCPM, VibeVoice](docs/EXTERNAL_REVIEW_TTS_BACKENDS.md)
 - [KVAE Convert Engine](docs/KVAE_CONVERT_ENGINE.md)
 - [Vocal Tract Voice Design](docs/VOCAL_TRACT_ENGINE.md)
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)

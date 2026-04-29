@@ -6,11 +6,19 @@ KVAE now owns the full local render path:
 UTF-8 Korean text file
   -> Korean normalization
   -> voice profile resolution
-  -> VoxCPM LoRA generation
+  -> VoxCPM2 generation
   -> role pitch/speed transform
   -> loudness normalization
   -> WAV + manifest
 ```
+
+The current production backend is VoxCPM2 through `kva render --engine voxcpm`. Other reviewed backends, such as MOSS-TTS-Nano and VibeVoice-Realtime, are tracked as candidates through:
+
+```powershell
+python -m kva_engine tts-backends
+```
+
+Do not treat a reviewed backend as integrated until it appears as `integrated_default` or another production status in that report.
 
 ## Quick Start
 
@@ -78,3 +86,10 @@ python -m kva_engine render `
 ## Current Limit
 
 A very short LoRA or reference voice can prove that the KVAE-owned path works, but production-quality Korean voice acting needs more clean recordings and a larger reviewed transcript set.
+
+## Backend Notes
+
+- VoxCPM2 remains the default because it officially supports Korean, exposes voice design and reference-voice cloning, and uses Apache-2.0 licensing.
+- MOSS-TTS-Nano is a useful future fallback candidate because it is small, CPU-friendly, and has an ONNX CPU path.
+- VibeVoice-Realtime is research-only for Korean because the project describes Korean support as experimental and warns against real-world use without further testing.
+- VibeVoice-ASR may become useful for long-form Korean transcript review, but it is not a render backend.
