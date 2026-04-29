@@ -20,6 +20,7 @@ from kva_engine.public_voices import (
     public_voice_profile,
 )
 from kva_engine.review.audio_review import recording_check, review_audio
+from kva_engine.review.character_review import review_character_audio
 from kva_engine.review.manifest import build_generation_manifest
 from kva_engine.sound_design import (
     build_creature_design_recipe,
@@ -167,6 +168,15 @@ def main(argv: list[str] | None = None) -> int:
     audio_review_parser.add_argument("--role", help="Voice acting role")
     audio_review_parser.add_argument("--out", help="Output JSON path")
     audio_review_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
+
+    character_review_parser = subparsers.add_parser(
+        "review-character",
+        help="Review whether a WAV matches the requested KVAE character role",
+    )
+    character_review_parser.add_argument("--audio", required=True, help="WAV path to review")
+    character_review_parser.add_argument("--role", required=True, choices=sorted(PRESETS))
+    character_review_parser.add_argument("--out", help="Output character review JSON path")
+    character_review_parser.add_argument("--compact", action="store_true", help="Print compact JSON")
 
     recording_check_parser = subparsers.add_parser("recording-check", help="Check raw recording quality for KVAE training")
     recording_check_parser.add_argument("--audio", required=True, help="Recording WAV path to check")
@@ -439,6 +449,12 @@ def main(argv: list[str] | None = None) -> int:
             asr_text=args.asr_text,
             role=args.role,
             voice_profile_path=args.voice_profile,
+        )
+        return _emit(review, out=args.out, compact=args.compact)
+    if args.command == "review-character":
+        review = review_character_audio(
+            audio_path=args.audio,
+            role=args.role,
         )
         return _emit(review, out=args.out, compact=args.compact)
     if args.command == "recording-check":

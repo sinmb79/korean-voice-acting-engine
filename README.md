@@ -33,6 +33,7 @@ KVAE therefore treats Korean normalization, voice profiles, role design, local t
 - License-safe source-library schema through `kva source-library`
 - Creature sound-design recipes through `kva creature-design`
 - Audio review with quality gates, optional Whisper ASR, CER, and WER
+- Character role-likeness review through `kva review-character`
 - Long recording segmentation through `kva split-recording`
 - Korean recording script generation, transcript review TSVs, and deterministic dataset splits
 - Built-in public Korean AI voice catalog with source, license, attribution, and AI-voice disclosure metadata
@@ -129,6 +130,15 @@ python -m kva_engine review-audio `
   --out outputs\monster.review.json
 ```
 
+Review whether the audio actually matches the requested character role:
+
+```powershell
+python -m kva_engine review-character `
+  --audio outputs\monster.wav `
+  --role monster_deep_clear `
+  --out outputs\monster.character-review.json
+```
+
 List public Korean AI voice options:
 
 ```powershell
@@ -202,6 +212,7 @@ Private recordings, datasets, LoRA checkpoints, and generated WAV files are inte
 - [Voice Lab Workflow](docs/VOICE_LAB_WORKFLOW.md)
 - [Recording Segmentation Workflow](docs/RECORDING_SEGMENTATION.md)
 - [KVAE Review Engine](docs/KVAE_REVIEW_ENGINE.md)
+- [Character Review Engine](docs/CHARACTER_REVIEW_ENGINE.md)
 - [Professional Voice Product Benchmark Plan](docs/PRO_VOICE_BENCHMARK_PLAN.md)
 - [Professional Voice Benchmark Implementation](docs/PRO_VOICE_BENCHMARK_IMPLEMENTATION.md)
 - [Creator Sound Design Engine](docs/CREATOR_SOUND_DESIGN_ENGINE.md)

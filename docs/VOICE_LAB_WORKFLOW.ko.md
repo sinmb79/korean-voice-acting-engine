@@ -9,8 +9,9 @@
 1. 음성 변환
 2. 배역별 manifest 작성
 3. 선택적 오디오 리뷰
-4. playlist 생성
-5. summary report 생성
+4. 배역별 character-fit 리뷰
+5. playlist 생성
+6. summary report 생성
 
 기본 변환 엔진은 KVAE 자체 WAV 렌더러인 `kva-native-character-v1`입니다. 기존 ffmpeg 필터 경로가 필요할 때만 `--engine ffmpeg`를 사용합니다.
 
@@ -33,6 +34,7 @@ python -m kva_engine voice-lab `
 - `*.result.json`
 - `*.manifest.json`
 - `*.review.json`
+- `*.character-review.json`
 - `playlist.m3u`
 - `voice_lab_summary.json`
 - `README.md`
@@ -69,6 +71,10 @@ python -m kva_engine voice-lab `
 
 대사는 `*_clear` 계열을 먼저 비교하는 것이 좋습니다. heavy, fx, roar 계열은 명료도보다 캐릭터성과 연출감을 확인하는 후보로 보는 것이 안전합니다.
 
+## Character Review
+
+review가 켜져 있으면 `voice-lab`은 각 후보마다 `kva review-character`도 함께 실행합니다. 요약에는 `character_score`, `character_status`, character warning이 들어가므로, WAV가 기술적으로는 정상이어도 공룡/어린이/괴물처럼 들리지 않는 후보를 바로 확인할 수 있습니다.
+
 ## 남은 개발
 
 `voice-lab`은 안정적인 계약을 먼저 만든 워크플로입니다. 앞으로 다음 방향으로 확장합니다.
@@ -76,5 +82,5 @@ python -m kva_engine voice-lab `
 - 더 강력한 KVAE 자체 neural speech-to-speech 변환
 - 공개 음성 모델 렌더 어댑터
 - 로컬 GUI
-- 배역별 한국어 명료도와 역할 유사도 기준
+- 학습형 배역별 한국어 명료도와 역할 유사도 기준
 - 더 큰 한국어 연기 데이터셋

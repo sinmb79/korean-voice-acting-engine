@@ -9,8 +9,9 @@ It wraps:
 1. voice conversion
 2. per-role manifest writing
 3. optional audio review
-4. playlist generation
-5. summary report generation
+4. per-role character-fit review
+5. playlist generation
+6. summary report generation
 
 The default conversion engine is `kva-native-character-v1`, KVAE's in-engine WAV renderer. Use `--engine ffmpeg` only when deliberately choosing the legacy filter path.
 
@@ -33,6 +34,7 @@ The output folder contains:
 - `*.result.json`
 - `*.manifest.json`
 - `*.review.json`
+- `*.character-review.json`
 - `playlist.m3u`
 - `voice_lab_summary.json`
 - `README.md`
@@ -71,6 +73,10 @@ Default group roles:
 
 Clear roles are preferred for dialogue. Heavy, FX, and roar roles are better treated as performance texture.
 
+## Character Review
+
+When review is enabled, `voice-lab` also runs `kva review-character` for each rendered candidate. The summary includes `character_score`, `character_status`, and character warnings, so a weak dinosaur or child candidate is visible even when the WAV is technically valid.
+
 ## Remaining Development
 
 `voice-lab` is intentionally built around a stable contract. The deterministic native conversion engine can later be replaced or supplemented with:
@@ -78,5 +84,5 @@ Clear roles are preferred for dialogue. Heavy, FX, and roar roles are better tre
 - stronger KVAE-native neural speech-to-speech conversion
 - public voice model render adapters
 - a local GUI
-- per-role Korean intelligibility and role-likeness thresholds
+- learned per-role Korean intelligibility and role-likeness thresholds
 - larger acting datasets

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from kva_engine.review.audio_review import review_audio, write_review
+from kva_engine.review.character_review import review_character_audio
 from kva_engine.synthesis.conversion import build_voice_conversion_plan, convert_voice_file
 
 
@@ -103,6 +104,7 @@ def run_voice_lab_conversion(
         result_path = destination / f"{role}.result.json"
         manifest_path = destination / f"{role}.manifest.json"
         review_path = destination / f"{role}.review.json"
+        character_review_path = destination / f"{role}.character-review.json"
 
         plan = build_voice_conversion_plan(
             input_path=source,
@@ -124,6 +126,7 @@ def run_voice_lab_conversion(
         _write_json(result_path, result)
 
         review_payload = None
+        character_review_payload = None
         if review and not dry_run:
             review_payload = review_audio(
                 audio_path=wav_path,
@@ -134,6 +137,8 @@ def run_voice_lab_conversion(
                 voice_profile_path=voice_profile_path,
             )
             write_review(review_payload, review_path)
+            character_review_payload = review_character_audio(audio_path=wav_path, role=role)
+            _write_json(character_review_path, character_review_payload)
 
         samples.append(
             _sample_summary(
@@ -142,8 +147,10 @@ def run_voice_lab_conversion(
                 result_path=result_path,
                 manifest_path=manifest_path,
                 review_path=review_path if review and not dry_run else None,
+                character_review_path=character_review_path if review and not dry_run else None,
                 result=result,
                 review=review_payload,
+                character_review=character_review_payload,
             )
         )
 
@@ -170,9 +177,10 @@ def run_voice_lab_conversion(
         "ok": all(sample["ok"] for sample in samples),
         "remaining_development": [
             "Add neural speech-to-speech backend behind the same voice-lab contract.",
+            "Train human-rated role-likeness evaluators beyond the current acoustic proxy.",
             "Add a local GUI for non-developer users.",
             "Add public voice installation/render adapters after license-safe install prompts.",
-            "Expand Korean acting datasets and role-specific evaluation thresholds.",
+            "Expand Korean acting datasets and role-specific acceptance thresholds.",
         ],
     }
     _write_json(summary_path, summary)
@@ -187,22 +195,30 @@ def _sample_summary(
     result_path: Path,
     manifest_path: Path,
     review_path: Path | None,
+    character_review_path: Path | None,
     result: dict[str, Any],
     review: dict[str, Any] | None,
+    character_review: dict[str, Any] | None,
 ) -> dict[str, Any]:
     metrics = review.get("metrics") if review else None
+    character_warnings = character_review.get("warnings", []) if character_review else []
     return {
         "role": role,
-        "ok": bool(result.get("ok")) and (review.get("ok", True) if review else True),
+        "ok": bool(result.get("ok"))
+        and (review.get("ok", True) if review else True)
+        and (character_review.get("ok", True) if character_review else True),
         "wav_path": str(wav_path),
         "result_path": str(result_path),
         "manifest_path": str(manifest_path),
         "review_path": str(review_path) if review_path else None,
+        "character_review_path": str(character_review_path) if character_review_path else None,
         "audio": result.get("audio"),
         "quality": review.get("quality") if review else None,
+        "character_score": character_review.get("score") if character_review else None,
+        "character_status": character_review.get("status") if character_review else None,
         "cer_percent": metrics.get("cer", {}).get("percent") if metrics else None,
         "wer_percent": metrics.get("wer", {}).get("percent") if metrics else None,
-        "warnings": sorted(set(result.get("warnings", []) + (review.get("warnings", []) if review else []))),
+        "warnings": sorted(set(result.get("warnings", []) + (review.get("warnings", []) if review else []) + character_warnings)),
     }
 
 
@@ -219,10 +235,11 @@ def _write_readme(path: Path, summary: dict[str, Any]) -> None:
     rows = []
     for sample in summary["samples"]:
         rows.append(
-            "| {role} | {ok} | `{wav}` | {cer} | {wer} | {warnings} |".format(
+            "| {role} | {ok} | `{wav}` | {character} | {cer} | {wer} | {warnings} |".format(
                 role=sample["role"],
                 ok="ok" if sample["ok"] else "review",
                 wav=Path(sample["wav_path"]).name,
+                character=_score(sample["character_score"]),
                 cer=_percent(sample["cer_percent"]),
                 wer=_percent(sample["wer_percent"]),
                 warnings=", ".join(sample["warnings"]) or "-",
@@ -243,8 +260,8 @@ def _write_readme(path: Path, summary: dict[str, Any]) -> None:
             "",
             "## Samples",
             "",
-            "| role | status | file | CER | WER | warnings |",
-            "| --- | --- | --- | ---: | ---: | --- |",
+            "| role | status | file | character | CER | WER | warnings |",
+            "| --- | --- | --- | ---: | ---: | ---: | --- |",
             *rows,
             "",
             "## Files",
@@ -263,6 +280,10 @@ def _write_readme(path: Path, summary: dict[str, Any]) -> None:
 
 def _percent(value: float | int | None) -> str:
     return "-" if value is None else f"{float(value):.3f}%"
+
+
+def _score(value: float | int | None) -> str:
+    return "-" if value is None else f"{float(value):.1f}"
 
 
 def _job_id() -> str:
